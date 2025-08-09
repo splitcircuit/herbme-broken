@@ -7,6 +7,8 @@ import Navigation from "@/components/ui/navigation";
 import Footer from "@/components/ui/footer";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
+import Quiz from "./pages/Quiz";
+import BuildOil from "./pages/BuildOil";
 import Product from "./pages/Product";
 import Story from "./pages/Story";
 import Blog from "./pages/Blog";
@@ -27,6 +29,8 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/shop" element={<Shop />} />
+              <Route path="/quiz" element={<Quiz />} />
+              <Route path="/build-oil" element={<BuildOil />} />
               <Route path="/product/:id" element={<Product />} />
               <Route path="/story" element={<Story />} />
               <Route path="/blog" element={<Blog />} />

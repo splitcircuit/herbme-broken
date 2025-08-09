@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
 
 const Navigation = () => {
@@ -9,8 +9,9 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navItems = [
-    { name: "Home", path: "/" },
     { name: "Shop", path: "/shop" },
+    { name: "Quiz", path: "/quiz" },
+    { name: "Build Oil", path: "/build-oil" },
     { name: "Our Story", path: "/story" },
     { name: "Blog", path: "/blog" },
     { name: "Contact", path: "/contact" },
@@ -45,8 +46,22 @@ const Navigation = () => {
             ))}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
+          {/* Auth and Cart Section */}
+          <div className="hidden md:flex items-center space-x-4">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+              <ShoppingBag className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
+              <User className="h-5 w-5 mr-2" />
+              Sign In
+            </Button>
+          </div>
+
+          {/* Mobile menu and auth buttons */}
+          <div className="flex items-center space-x-2 md:hidden">
+            <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <ShoppingBag className="h-5 w-5" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -76,6 +91,18 @@ const Navigation = () => {
                   {item.name}
                 </Link>
               ))}
+              
+              {/* Mobile Auth */}
+              <div className="border-t border-border pt-3 mt-3">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="w-full justify-start text-muted-foreground hover:text-primary"
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Sign In
+                </Button>
+              </div>
             </div>
           </div>
         )}

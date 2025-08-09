@@ -14,7 +14,195 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      custom_oil_blends: {
+        Row: {
+          base_oils: Json
+          blend_name: string
+          boost_ingredients: string[] | null
+          bottle_size: string
+          created_at: string
+          custom_scent: string | null
+          id: string
+          is_saved: boolean | null
+          scent: string | null
+          total_price: number | null
+          user_id: string | null
+        }
+        Insert: {
+          base_oils: Json
+          blend_name: string
+          boost_ingredients?: string[] | null
+          bottle_size: string
+          created_at?: string
+          custom_scent?: string | null
+          id?: string
+          is_saved?: boolean | null
+          scent?: string | null
+          total_price?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          base_oils?: Json
+          blend_name?: string
+          boost_ingredients?: string[] | null
+          bottle_size?: string
+          created_at?: string
+          custom_scent?: string | null
+          id?: string
+          is_saved?: boolean | null
+          scent?: string | null
+          total_price?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          ingredients: string[] | null
+          is_active: boolean | null
+          name: string
+          price: number | null
+          skin_goals: string[] | null
+          skin_types: string[] | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          ingredients?: string[] | null
+          is_active?: boolean | null
+          name: string
+          price?: number | null
+          skin_goals?: string[] | null
+          skin_types?: string[] | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          ingredients?: string[] | null
+          is_active?: boolean | null
+          name?: string
+          price?: number | null
+          skin_goals?: string[] | null
+          skin_types?: string[] | null
+        }
+        Relationships: []
+      }
+      quiz_recommendations: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string | null
+          quiz_response_id: string | null
+          reasoning: string | null
+          step_name: string
+          step_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          quiz_response_id?: string | null
+          reasoning?: string | null
+          step_name: string
+          step_order: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string | null
+          quiz_response_id?: string | null
+          reasoning?: string | null
+          step_name?: string
+          step_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_recommendations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_recommendations_quiz_response_id_fkey"
+            columns: ["quiz_response_id"]
+            isOneToOne: false
+            referencedRelation: "quiz_responses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quiz_responses: {
+        Row: {
+          active_ingredients: string[] | null
+          age_range: string | null
+          allergies: string[] | null
+          cleansing_feeling: string | null
+          combination_areas: string | null
+          created_at: string
+          email: string | null
+          id: string
+          location: string | null
+          product_preference: string | null
+          routine_preference: string | null
+          skin_concerns: string[] | null
+          skin_type: string[] | null
+          skincare_frequency: string | null
+          skincare_goals: string[] | null
+          sun_exposure: string | null
+          user_id: string | null
+        }
+        Insert: {
+          active_ingredients?: string[] | null
+          age_range?: string | null
+          allergies?: string[] | null
+          cleansing_feeling?: string | null
+          combination_areas?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          product_preference?: string | null
+          routine_preference?: string | null
+          skin_concerns?: string[] | null
+          skin_type?: string[] | null
+          skincare_frequency?: string | null
+          skincare_goals?: string[] | null
+          sun_exposure?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          active_ingredients?: string[] | null
+          age_range?: string | null
+          allergies?: string[] | null
+          cleansing_feeling?: string | null
+          combination_areas?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          location?: string | null
+          product_preference?: string | null
+          routine_preference?: string | null
+          skin_concerns?: string[] | null
+          skin_type?: string[] | null
+          skincare_frequency?: string | null
+          skincare_goals?: string[] | null
+          sun_exposure?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
