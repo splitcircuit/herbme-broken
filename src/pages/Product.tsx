@@ -5,12 +5,135 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Star, Leaf, Droplets, Sun } from "lucide-react";
 import { useParams, Link } from "react-router-dom";
+import { useEffect } from "react";
 import product1 from "@/assets/product-1.jpg";
 import product2 from "@/assets/product-2.jpg";
 import product3 from "@/assets/product-3.jpg";
 
+// Shopify Buy Button type declarations
+declare global {
+  interface Window {
+    ShopifyBuy?: {
+      buildClient: (config: { domain: string; storefrontAccessToken: string }) => any;
+      UI: {
+        onReady: (client: any) => Promise<any>;
+      };
+    };
+  }
+}
+
 const Product = () => {
   const { id } = useParams();
+
+  useEffect(() => {
+    // Load Shopify Buy Button script
+    const loadShopifyScript = () => {
+      if (window.ShopifyBuy) {
+        if (window.ShopifyBuy.UI) {
+          initializeShopifyBuyButton();
+        } else {
+          loadScript();
+        }
+      } else {
+        loadScript();
+      }
+    };
+
+    const loadScript = () => {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://sdks.shopifycdn.com/buy-button/latest/buy-button-storefront.min.js';
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(script);
+      script.onload = initializeShopifyBuyButton;
+    };
+
+    const initializeShopifyBuyButton = () => {
+      const client = window.ShopifyBuy.buildClient({
+        domain: '089d19-46.myshopify.com',
+        storefrontAccessToken: '104acab7f6116806004f40bfea218a3b',
+      });
+
+      window.ShopifyBuy.UI.onReady(client).then((ui) => {
+        ui.createComponent('product', {
+          id: '9968064069923',
+          node: document.getElementById('shopify-product-component'),
+          moneyFormat: '%24%7B%7Bamount%7D%7D',
+          options: {
+            product: {
+              styles: {
+                product: {
+                  "@media (min-width: 601px)": {
+                    "max-width": "100%",
+                    "margin-left": "0px",
+                    "margin-bottom": "0px"
+                  }
+                },
+                button: {
+                  "background-color": "#2B5A3E",
+                  ":hover": {
+                    "background-color": "#234A32"
+                  },
+                  "border-radius": "8px",
+                  "padding": "12px 24px"
+                }
+              },
+              buttonDestination: "checkout",
+              text: {
+                button: "Buy Now"
+              }
+            },
+            productSet: {
+              styles: {
+                products: {
+                  "@media (min-width: 601px)": {
+                    "margin-left": "0px"
+                  }
+                }
+              }
+            },
+            modalProduct: {
+              contents: {
+                img: false,
+                imgWithCarousel: true,
+                button: false,
+                buttonWithQuantity: true
+              },
+              styles: {
+                product: {
+                  "@media (min-width: 601px)": {
+                    "max-width": "100%",
+                    "margin-left": "0px",
+                    "margin-bottom": "0px"
+                  }
+                }
+              },
+              text: {
+                button: "Add to cart"
+              }
+            },
+            option: {},
+            cart: {
+              text: {
+                total: "Subtotal",
+                button: "Checkout"
+              }
+            },
+            toggle: {}
+          },
+        });
+      });
+    };
+
+    loadShopifyScript();
+
+    // Cleanup function
+    return () => {
+      const existingComponent = document.getElementById('shopify-product-component');
+      if (existingComponent) {
+        existingComponent.innerHTML = '';
+      }
+    };
+  }, [id]);
   
   // Mock product data - in a real app, this would come from an API
   const productData: { [key: string]: any } = {
@@ -146,15 +269,8 @@ const Product = () => {
               <CardContent className="p-6">
                 <h3 className="font-heading font-semibold mb-4">Purchase Options</h3>
                 <div className="space-y-4">
-                  <div className="p-4 border-2 border-dashed border-herb-light-green rounded-lg text-center">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Shopify Buy Button will be embedded here
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      This is where you'll add your Shopify Buy Button HTML code
-                    </p>
-                  </div>
-                  <div className="text-xs text-muted-foreground">
+                  <div id="shopify-product-component" className="min-h-[120px]"></div>
+                  <div className="text-xs text-muted-foreground border-t pt-4">
                     <p>✓ Free shipping on orders over $75</p>
                     <p>✓ 30-day satisfaction guarantee</p>
                     <p>✓ Handmade in Turks & Caicos Islands</p>
