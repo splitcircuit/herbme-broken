@@ -10,27 +10,27 @@ const Shop = () => {
   const products = [
     {
       id: 1,
-      name: "Sea Moss Recovery Cream",
-      price: "$45",
+      name: "Body Juice",
+      price: "$28",
       image: product1,
-      tag: "Best Seller",
-      description: "Ultra-hydrating cream with pure sea moss extract"
+      tag: "Summer Favorite",
+      description: "Luxuriously lightweight yet deeply hydrating body oil"
     },
     {
       id: 2,
-      name: "Turmeric Brightening Serum",
-      price: "$38",
+      name: "Foaming Body Scrub",
+      price: "$32",
       image: product2,
-      tag: "New",
-      description: "Brightening serum with golden turmeric and botanicals"
+      tag: "5-in-1 Essential",
+      description: "5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens"
     },
     {
       id: 3,
-      name: "Aloe Gentle Cleanser",
-      price: "$28",
+      name: "Body Mist",
+      price: "$24",
       image: product3,
-      tag: "Sensitive Skin",
-      description: "Gentle daily cleanser with soothing aloe vera"
+      tag: "Watermelon Bombshell",
+      description: "Juicy, sweet, and refreshing scent for long-lasting summer fragrance"
     },
     {
       id: 4,

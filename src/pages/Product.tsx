@@ -60,6 +60,14 @@ const Product = () => {
           moneyFormat: '%24%7B%7Bamount%7D%7D',
           options: {
             product: {
+              contents: {
+                title: false,
+                img: false,
+                price: true,
+                options: true,
+                quantity: true,
+                button: true
+              },
               styles: {
                 product: {
                   "@media (min-width: 601px)": {
@@ -138,40 +146,40 @@ const Product = () => {
   // Mock product data - in a real app, this would come from an API
   const productData: { [key: string]: any } = {
     "1": {
-      name: "Sea Moss Recovery Cream",
-      price: "$45",
+      name: "Body Juice",
+      price: "$28",
       image: product1,
-      tag: "Best Seller",
-      shortDescription: "Ultra-hydrating cream with pure sea moss extract",
-      longDescription: "Our signature Sea Moss Recovery Cream harnesses the incredible power of freshly harvested sea moss from the pristine waters surrounding the Turks & Caicos Islands. This luxurious cream provides deep hydration while supporting your skin's natural healing process.",
-      ingredients: ["Organic Sea Moss Extract", "Shea Butter", "Coconut Oil", "Vitamin E", "Aloe Vera", "Jojoba Oil"],
-      howToUse: "Apply a small amount to clean, dry skin. Gently massage in circular motions until fully absorbed. Use morning and evening for best results.",
-      skinTypes: ["Dry Skin", "Sensitive Skin", "Mature Skin", "All Skin Types"],
-      benefits: ["Deep Hydration", "Anti-Aging", "Healing Properties", "Natural Glow"]
+      tag: "Summer Favorite",
+      shortDescription: "Luxuriously lightweight yet deeply hydrating body oil",
+      longDescription: "Our Body Juice is luxuriously lightweight yet deeply hydrating, giving your skin a glowing, moisturized feel that lasts all day. Perfect for those sunny summer days when you want to shine without feeling greasy. Part of our Watermelon Bombshell collection designed to bring ultimate summer vibes.",
+      ingredients: ["Watermelon Seed Oil", "Jojoba Oil", "Sweet Almond Oil", "Vitamin E", "Natural Fragrance"],
+      howToUse: "Apply to clean, dry skin. Massage gently until absorbed. Perfect for layering with our Foaming Body Scrub and Body Mist for the complete summer experience.",
+      skinTypes: ["All Skin Types", "Dry Skin", "Normal Skin", "Summer Care"],
+      benefits: ["Deep Hydration", "Glowing Skin", "Non-Greasy", "Long-Lasting Moisture"]
     },
     "2": {
-      name: "Turmeric Brightening Serum",
-      price: "$38",
+      name: "Foaming Body Scrub",
+      price: "$32",
       image: product2,
-      tag: "New",
-      shortDescription: "Brightening serum with golden turmeric and botanicals",
-      longDescription: "Discover the brightening power of our Turmeric Brightening Serum, formulated with golden turmeric root and complementary botanicals. This lightweight serum helps even skin tone while providing antioxidant protection.",
-      ingredients: ["Turmeric Root Extract", "Vitamin C", "Hyaluronic Acid", "Niacinamide", "Rose Hip Oil", "Green Tea Extract"],
-      howToUse: "Apply 2-3 drops to clean skin before moisturizer. Use in the evening and always follow with SPF during the day.",
-      skinTypes: ["Dull Skin", "Uneven Tone", "Acne-Prone", "Normal Skin"],
-      benefits: ["Brightening", "Even Tone", "Antioxidant Protection", "Radiant Complexion"]
+      tag: "5-in-1 Essential",
+      shortDescription: "5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens",
+      longDescription: "Our Foaming Body Scrub is a 5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens your skin all in one step. This convenient formula saves you money and shower space compared to buying separate soap and scrub products. Part of our Watermelon Bombshell collection for ultimate summer vibes.",
+      ingredients: ["Watermelon Extract", "Sugar Crystals", "Coconut Oil", "Shea Butter", "Natural Foaming Agents", "Vitamin C"],
+      howToUse: "Apply to wet skin in circular motions. The formula will foam and exfoliate simultaneously. Rinse thoroughly. Follow with Body Juice for best results.",
+      skinTypes: ["All Skin Types", "Rough Skin", "Dull Skin", "Normal Skin"],
+      benefits: ["Exfoliates", "Cleanses", "Hydrates", "Softens", "Space-Saving"]
     },
     "3": {
-      name: "Aloe Gentle Cleanser",
-      price: "$28",
+      name: "Body Mist",
+      price: "$24",
       image: product3,
-      tag: "Sensitive Skin",
-      shortDescription: "Gentle daily cleanser with soothing aloe vera",
-      longDescription: "Start your skincare routine with our Aloe Gentle Cleanser, specially formulated for sensitive skin. This creamy cleanser removes impurities while maintaining your skin's natural moisture barrier.",
-      ingredients: ["Aloe Vera Gel", "Chamomile Extract", "Cucumber Extract", "Coconut-Derived Cleansers", "Glycerin", "Calendula Oil"],
-      howToUse: "Massage onto damp skin with gentle circular motions. Rinse thoroughly with lukewarm water. Use morning and evening.",
-      skinTypes: ["Sensitive Skin", "Dry Skin", "Reactive Skin", "All Skin Types"],
-      benefits: ["Gentle Cleansing", "Soothing", "Hydrating", "Non-Irritating"]
+      tag: "Watermelon Bombshell",
+      shortDescription: "Juicy, sweet, and refreshing scent for long-lasting summer fragrance",
+      longDescription: "Our Body Mist features a juicy, sweet, and refreshing watermelon scent that captures the essence of summer. Perfect for layering with the Foaming Body Scrub and Body Juice for a long-lasting summer fragrance experience. Part of our Watermelon Bombshell collection designed to bring ultimate summer vibes.",
+      ingredients: ["Watermelon Fragrance", "Aloe Vera", "Rose Water", "Glycerin", "Natural Preservatives"],
+      howToUse: "Spray on pulse points and body as desired. Layer with our Body Juice and use after our Foaming Body Scrub for the complete Watermelon Bombshell experience.",
+      skinTypes: ["All Skin Types", "Sensitive Skin", "Normal Skin", "Fragrance Lovers"],
+      benefits: ["Refreshing Scent", "Long-Lasting", "Layerable", "Summer Vibes"]
     }
   };
 
