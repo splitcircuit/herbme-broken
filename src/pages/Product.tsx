@@ -158,26 +158,38 @@ const Product = () => {
       benefits: ["Deep Hydration", "Glowing Skin", "Non-Greasy", "Long-Lasting Moisture"]
     },
     "2": {
+      name: "Body Juice",
+      price: "$26",
+      image: product2,
+      tag: "Sunkissed Collection",
+      shortDescription: "Hydrating body essence for glowing, moisturized skin",
+      longDescription: "Our Body Juice is a hydrating body essence that gives your skin a glowing, moisturized feel that lasts all day. This lightweight formula absorbs quickly while providing deep nourishment. Perfect for those sunny summer days when you want healthy, radiant skin. Part of our Sunkissed Collection designed to bring ultimate summer vibes.",
+      ingredients: ["Aloe Vera Extract", "Hyaluronic Acid", "Watermelon Extract", "Glycerin", "Natural Moisturizers"],
+      howToUse: "Apply to clean, damp skin. Massage gently until absorbed. Can be used alone or layered under Watermelon Bombshell body oil for extra hydration.",
+      skinTypes: ["All Skin Types", "Dehydrated Skin", "Normal Skin", "Combination Skin"],
+      benefits: ["Deep Hydration", "Glowing Skin", "Quick Absorption", "Lightweight Feel"]
+    },
+    "3": {
       name: "Foaming Body Scrub",
       price: "$32",
-      image: product2,
+      image: product3,
       tag: "Sunkissed Collection",
       shortDescription: "5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens",
       longDescription: "Our Foaming Body Scrub is a 5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens your skin all in one step. This convenient formula saves you money and shower space compared to buying separate soap and scrub products. Part of our Sunkissed Collection for ultimate summer vibes.",
       ingredients: ["Watermelon Extract", "Sugar Crystals", "Coconut Oil", "Shea Butter", "Natural Foaming Agents", "Vitamin C"],
-      howToUse: "Apply to wet skin in circular motions. The formula will foam and exfoliate simultaneously. Rinse thoroughly. Follow with Watermelon Bombshell body oil for best results.",
+      howToUse: "Apply to wet skin in circular motions. The formula will foam and exfoliate simultaneously. Rinse thoroughly. Follow with Body Juice or Watermelon Bombshell body oil for best results.",
       skinTypes: ["All Skin Types", "Rough Skin", "Dull Skin", "Normal Skin"],
       benefits: ["Exfoliates", "Cleanses", "Hydrates", "Softens", "Space-Saving"]
     },
-    "3": {
+    "4": {
       name: "Body Mist",
       price: "$24",
-      image: product3,
+      image: product1,
       tag: "Sunkissed Collection",
       shortDescription: "Juicy, sweet, and refreshing scent for long-lasting summer fragrance",
-      longDescription: "Our Body Mist features a juicy, sweet, and refreshing watermelon scent that captures the essence of summer. Perfect for layering with the Foaming Body Scrub and Watermelon Bombshell body oil for a long-lasting summer fragrance experience. Part of our Sunkissed Collection designed to bring ultimate summer vibes.",
+      longDescription: "Our Body Mist features a juicy, sweet, and refreshing watermelon scent that captures the essence of summer. Perfect for layering with the Foaming Body Scrub, Body Juice, and Watermelon Bombshell body oil for a long-lasting summer fragrance experience. Part of our Sunkissed Collection designed to bring ultimate summer vibes.",
       ingredients: ["Watermelon Fragrance", "Aloe Vera", "Rose Water", "Glycerin", "Natural Preservatives"],
-      howToUse: "Spray on pulse points and body as desired. Layer with our Watermelon Bombshell body oil and use after our Foaming Body Scrub for the complete Sunkissed Collection experience.",
+      howToUse: "Spray on pulse points and body as desired. Layer with our Body Juice and Watermelon Bombshell body oil, and use after our Foaming Body Scrub for the complete Sunkissed Collection experience.",
       skinTypes: ["All Skin Types", "Sensitive Skin", "Normal Skin", "Fragrance Lovers"],
       benefits: ["Refreshing Scent", "Long-Lasting", "Layerable", "Summer Vibes"]
     }

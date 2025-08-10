@@ -18,17 +18,25 @@ const Shop = () => {
     },
     {
       id: 2,
+      name: "Body Juice",
+      price: "$26",
+      image: product2,
+      tag: "Sunkissed Collection",
+      description: "Hydrating body essence for glowing, moisturized skin"
+    },
+    {
+      id: 3,
       name: "Foaming Body Scrub",
       price: "$32",
-      image: product2,
+      image: product3,
       tag: "Sunkissed Collection",
       description: "5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens"
     },
     {
-      id: 3,
+      id: 4,
       name: "Body Mist",
       price: "$24",
-      image: product3,
+      image: product1,
       tag: "Sunkissed Collection",
       description: "Juicy, sweet, and refreshing scent for long-lasting summer fragrance"
     }
