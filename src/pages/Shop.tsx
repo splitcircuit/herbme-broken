@@ -31,30 +31,6 @@ const Shop = () => {
       image: product3,
       tag: "Watermelon Bombshell",
       description: "Juicy, sweet, and refreshing scent for long-lasting summer fragrance"
-    },
-    {
-      id: 4,
-      name: "Island Glow Face Oil",
-      price: "$52",
-      image: product1,
-      tag: "Premium",
-      description: "Luxurious face oil with tropical botanicals"
-    },
-    {
-      id: 5,
-      name: "Coconut Butter Body Cream",
-      price: "$35",
-      image: product2,
-      tag: "Bestseller",
-      description: "Rich body cream with organic coconut butter"
-    },
-    {
-      id: 6,
-      name: "Hibiscus Toning Mist",
-      price: "$24",
-      image: product3,
-      tag: "Refreshing",
-      description: "Hydrating toner mist with hibiscus extract"
     }
   ];
 
