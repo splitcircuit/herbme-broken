@@ -10,10 +10,10 @@ const Shop = () => {
   const products = [
     {
       id: 1,
-      name: "Body Juice",
+      name: "Watermelon Bombshell",
       price: "$28",
       image: product1,
-      tag: "Summer Favorite",
+      tag: "Sunkissed Collection",
       description: "Luxuriously lightweight yet deeply hydrating body oil"
     },
     {
@@ -21,7 +21,7 @@ const Shop = () => {
       name: "Foaming Body Scrub",
       price: "$32",
       image: product2,
-      tag: "5-in-1 Essential",
+      tag: "Sunkissed Collection",
       description: "5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens"
     },
     {
@@ -29,7 +29,7 @@ const Shop = () => {
       name: "Body Mist",
       price: "$24",
       image: product3,
-      tag: "Watermelon Bombshell",
+      tag: "Sunkissed Collection",
       description: "Juicy, sweet, and refreshing scent for long-lasting summer fragrance"
     }
   ];
@@ -40,11 +40,11 @@ const Shop = () => {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-heading font-bold text-brand-brown mb-4">
-            Our Collection
+            Sunkissed Collection
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover our complete range of handcrafted skincare products, each infused with the 
-            finest natural ingredients from the Turks & Caicos Islands.
+            Discover our complete Sunkissed Collection of handcrafted skincare products, each designed to bring 
+            ultimate summer vibes with the finest natural ingredients from the Turks & Caicos Islands.
           </p>
         </div>
 

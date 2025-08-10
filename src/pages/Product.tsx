@@ -146,12 +146,12 @@ const Product = () => {
   // Mock product data - in a real app, this would come from an API
   const productData: { [key: string]: any } = {
     "1": {
-      name: "Body Juice",
+      name: "Watermelon Bombshell",
       price: "$28",
       image: product1,
-      tag: "Summer Favorite",
+      tag: "Sunkissed Collection",
       shortDescription: "Luxuriously lightweight yet deeply hydrating body oil",
-      longDescription: "Our Body Juice is luxuriously lightweight yet deeply hydrating, giving your skin a glowing, moisturized feel that lasts all day. Perfect for those sunny summer days when you want to shine without feeling greasy. Part of our Watermelon Bombshell collection designed to bring ultimate summer vibes.",
+      longDescription: "Our Watermelon Bombshell body oil is luxuriously lightweight yet deeply hydrating, giving your skin a glowing, moisturized feel that lasts all day. Perfect for those sunny summer days when you want to shine without feeling greasy. Part of our Sunkissed Collection designed to bring ultimate summer vibes.",
       ingredients: ["Watermelon Seed Oil", "Jojoba Oil", "Sweet Almond Oil", "Vitamin E", "Natural Fragrance"],
       howToUse: "Apply to clean, dry skin. Massage gently until absorbed. Perfect for layering with our Foaming Body Scrub and Body Mist for the complete summer experience.",
       skinTypes: ["All Skin Types", "Dry Skin", "Normal Skin", "Summer Care"],
@@ -161,11 +161,11 @@ const Product = () => {
       name: "Foaming Body Scrub",
       price: "$32",
       image: product2,
-      tag: "5-in-1 Essential",
+      tag: "Sunkissed Collection",
       shortDescription: "5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens",
-      longDescription: "Our Foaming Body Scrub is a 5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens your skin all in one step. This convenient formula saves you money and shower space compared to buying separate soap and scrub products. Part of our Watermelon Bombshell collection for ultimate summer vibes.",
+      longDescription: "Our Foaming Body Scrub is a 5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens your skin all in one step. This convenient formula saves you money and shower space compared to buying separate soap and scrub products. Part of our Sunkissed Collection for ultimate summer vibes.",
       ingredients: ["Watermelon Extract", "Sugar Crystals", "Coconut Oil", "Shea Butter", "Natural Foaming Agents", "Vitamin C"],
-      howToUse: "Apply to wet skin in circular motions. The formula will foam and exfoliate simultaneously. Rinse thoroughly. Follow with Body Juice for best results.",
+      howToUse: "Apply to wet skin in circular motions. The formula will foam and exfoliate simultaneously. Rinse thoroughly. Follow with Watermelon Bombshell body oil for best results.",
       skinTypes: ["All Skin Types", "Rough Skin", "Dull Skin", "Normal Skin"],
       benefits: ["Exfoliates", "Cleanses", "Hydrates", "Softens", "Space-Saving"]
     },
@@ -173,11 +173,11 @@ const Product = () => {
       name: "Body Mist",
       price: "$24",
       image: product3,
-      tag: "Watermelon Bombshell",
+      tag: "Sunkissed Collection",
       shortDescription: "Juicy, sweet, and refreshing scent for long-lasting summer fragrance",
-      longDescription: "Our Body Mist features a juicy, sweet, and refreshing watermelon scent that captures the essence of summer. Perfect for layering with the Foaming Body Scrub and Body Juice for a long-lasting summer fragrance experience. Part of our Watermelon Bombshell collection designed to bring ultimate summer vibes.",
+      longDescription: "Our Body Mist features a juicy, sweet, and refreshing watermelon scent that captures the essence of summer. Perfect for layering with the Foaming Body Scrub and Watermelon Bombshell body oil for a long-lasting summer fragrance experience. Part of our Sunkissed Collection designed to bring ultimate summer vibes.",
       ingredients: ["Watermelon Fragrance", "Aloe Vera", "Rose Water", "Glycerin", "Natural Preservatives"],
-      howToUse: "Spray on pulse points and body as desired. Layer with our Body Juice and use after our Foaming Body Scrub for the complete Watermelon Bombshell experience.",
+      howToUse: "Spray on pulse points and body as desired. Layer with our Watermelon Bombshell body oil and use after our Foaming Body Scrub for the complete Sunkissed Collection experience.",
       skinTypes: ["All Skin Types", "Sensitive Skin", "Normal Skin", "Fragrance Lovers"],
       benefits: ["Refreshing Scent", "Long-Lasting", "Layerable", "Summer Vibes"]
     }
