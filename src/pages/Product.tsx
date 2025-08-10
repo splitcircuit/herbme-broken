@@ -63,7 +63,7 @@ const Product = () => {
               contents: {
                 title: false,
                 img: false,
-                price: true,
+                price: false,
                 options: true,
                 quantity: true,
                 button: true
