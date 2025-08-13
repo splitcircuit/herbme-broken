@@ -15,22 +15,35 @@ interface CartItem {
 }
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+
+  // Recommended items that users can add manually
+  const recommendedItems = [
     {
-      id: '1',
+      id: 'rec-1',
       name: 'Watermelon Bombshell',
       price: 25,
-      quantity: 1,
-      type: 'product'
+      image: '/assets/product-1.jpg',
+      type: 'product' as const,
+      description: 'Refreshing summer glow oil'
     },
     {
-      id: '2', 
-      name: 'My Perfect Glow Oil',
-      price: 45,
-      quantity: 1,
-      type: 'custom_blend'
+      id: 'rec-2',
+      name: 'Island Dream Oil',
+      price: 28,
+      image: '/assets/product-2.jpg', 
+      type: 'product' as const,
+      description: 'Tropical paradise scent'
+    },
+    {
+      id: 'rec-3',
+      name: 'Golden Hour Blend',
+      price: 30,
+      image: '/assets/product-3.jpg',
+      type: 'product' as const,
+      description: 'Perfect sunset glow'
     }
-  ]);
+  ];
 
   const updateQuantity = (id: string, newQuantity: number) => {
     if (newQuantity === 0) {
@@ -44,6 +57,21 @@ const Cart = () => {
 
   const removeItem = (id: string) => {
     setCartItems(cartItems.filter(item => item.id !== id));
+  };
+
+  const addToCart = (item: typeof recommendedItems[0]) => {
+    const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
+    if (existingItem) {
+      updateQuantity(item.id, existingItem.quantity + 1);
+    } else {
+      setCartItems([...cartItems, {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        quantity: 1,
+        type: item.type
+      }]);
+    }
   };
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -60,16 +88,53 @@ const Cart = () => {
         </div>
 
         {cartItems.length === 0 ? (
-          <Card className="text-center py-12">
-            <CardContent>
-              <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-              <p className="text-muted-foreground mb-6">Add some amazing products to get started!</p>
-              <Button asChild>
-                <a href="/shop">Continue Shopping</a>
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="space-y-8">
+            <Card className="text-center py-12">
+              <CardContent>
+                <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+                <p className="text-muted-foreground mb-6">Add some amazing products to get started!</p>
+                <Button asChild>
+                  <a href="/shop">Continue Shopping</a>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Recommended Items */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Frequently Bought Items</CardTitle>
+                <CardDescription>Add these popular items to your cart</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {recommendedItems.map((item) => (
+                    <div key={item.id} className="border rounded-lg p-4 space-y-3">
+                      <div className="aspect-square bg-muted rounded-md flex items-center justify-center">
+                        <img 
+                          src={item.image} 
+                          alt={item.name}
+                          className="w-full h-full object-cover rounded-md"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{item.name}</h3>
+                        <p className="text-sm text-muted-foreground">{item.description}</p>
+                        <p className="text-lg font-bold text-primary">${item.price}</p>
+                      </div>
+                      <Button 
+                        onClick={() => addToCart(item)}
+                        className="w-full"
+                        size="sm"
+                      >
+                        Add to Cart
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Cart Items */}
