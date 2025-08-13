@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface QuizData {
   skincare_goals: string[];
@@ -48,6 +49,7 @@ const Quiz = () => {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const questions = [
     {
@@ -241,12 +243,26 @@ const Quiz = () => {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save your quiz results.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // Save quiz response
+      // Save quiz response with user_id
+      const quizDataWithUser = {
+        ...quizData,
+        user_id: user.id
+      };
+
       const { data: quizResponse, error } = await supabase
         .from('quiz_responses')
-        .insert([quizData])
+        .insert([quizDataWithUser])
         .select()
         .single();
 

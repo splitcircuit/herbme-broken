@@ -1,12 +1,14 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ShoppingBag, User } from "lucide-react";
+import { Menu, X, ShoppingBag, User, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   const navItems = [
     { name: "Shop", path: "/shop" },
@@ -51,10 +53,29 @@ const Navigation = () => {
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
               <ShoppingBag className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-              <User className="h-5 w-5 mr-2" />
-              Sign In
-            </Button>
+            {user ? (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={signOut}
+                className="text-muted-foreground hover:text-primary"
+              >
+                <LogOut className="h-5 w-5 mr-2" />
+                Sign Out
+              </Button>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                asChild
+                className="text-muted-foreground hover:text-primary"
+              >
+                <Link to="/auth">
+                  <User className="h-5 w-5 mr-2" />
+                  Sign In
+                </Link>
+              </Button>
+            )}
           </div>
 
           {/* Mobile menu and auth buttons */}
@@ -94,14 +115,29 @@ const Navigation = () => {
               
               {/* Mobile Auth */}
               <div className="border-t border-border pt-3 mt-3">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="w-full justify-start text-muted-foreground hover:text-primary"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
-                </Button>
+                {user ? (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={signOut}
+                    className="w-full justify-start text-muted-foreground hover:text-primary"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                ) : (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    asChild
+                    className="w-full justify-start text-muted-foreground hover:text-primary"
+                  >
+                    <Link to="/auth">
+                      <User className="h-4 w-4 mr-2" />
+                      Sign In
+                    </Link>
+                  </Button>
+                )}
               </div>
             </div>
           </div>

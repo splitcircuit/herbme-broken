@@ -9,6 +9,7 @@ import { Slider } from "@/components/ui/slider";
 import { ArrowLeft, ArrowRight, Droplets, Plus, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface BaseOil {
   name: string;
@@ -38,6 +39,7 @@ const BuildOil = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [allergens, setAllergens] = useState<string[]>([]);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const baseOilOptions = [
     { 
@@ -261,8 +263,17 @@ const BuildOil = () => {
   };
 
   const saveBlend = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to save your custom blend.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const blendData: CustomBlend = {
+      const blendData = {
         blend_name: blendName,
         base_oils: selectedBaseOils.reduce((acc, oil) => {
           acc[oil.name] = oil.percentage;
@@ -272,7 +283,9 @@ const BuildOil = () => {
         scent: scent,
         custom_scent: customScent,
         bottle_size: bottleSize,
-        total_price: totalPrice
+        total_price: totalPrice,
+        user_id: user.id,
+        is_saved: true
       };
 
       const { error } = await supabase
