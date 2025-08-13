@@ -7,6 +7,7 @@ import Navigation from "@/components/ui/navigation";
 import Footer from "@/components/ui/footer";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { CartProvider } from "@/contexts/CartContext";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
@@ -28,34 +29,36 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <div className="min-h-screen flex flex-col">
-            <Navigation />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/quiz" element={
-                  <ProtectedRoute>
-                    <Quiz />
-                  </ProtectedRoute>
-                } />
-                <Route path="/build-oil" element={
-                  <ProtectedRoute>
-                    <BuildOil />
-                  </ProtectedRoute>
-                } />
-                <Route path="/product/:id" element={<Product />} />
-                <Route path="/story" element={<Story />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/contact" element={<Contact />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
+          <CartProvider>
+            <div className="min-h-screen flex flex-col">
+              <Navigation />
+              <main className="flex-1">
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/quiz" element={
+                    <ProtectedRoute>
+                      <Quiz />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/build-oil" element={
+                    <ProtectedRoute>
+                      <BuildOil />
+                    </ProtectedRoute>
+                  } />
+                  <Route path="/product/:id" element={<Product />} />
+                  <Route path="/story" element={<Story />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/contact" element={<Contact />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </main>
+              <Footer />
+            </div>
+          </CartProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

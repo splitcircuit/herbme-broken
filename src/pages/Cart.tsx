@@ -1,21 +1,12 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, Minus, Plus, Trash2 } from "lucide-react";
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image?: string;
-  type: 'product' | 'custom_blend';
-}
+import { useCart } from "@/contexts/CartContext";
 
 const Cart = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const { cartItems, addToCart, updateQuantity, removeItem, getCartTotal } = useCart();
 
   // Recommended items that users can add manually
   const recommendedItems = [
@@ -45,39 +36,17 @@ const Cart = () => {
     }
   ];
 
-  const updateQuantity = (id: string, newQuantity: number) => {
-    if (newQuantity === 0) {
-      setCartItems(cartItems.filter(item => item.id !== id));
-    } else {
-      setCartItems(cartItems.map(item => 
-        item.id === id ? { ...item, quantity: newQuantity } : item
-      ));
-    }
+  const addToCartHandler = (item: typeof recommendedItems[0]) => {
+    addToCart({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      type: item.type
+    });
   };
 
-  const removeItem = (id: string) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
-
-  const addToCart = (item: typeof recommendedItems[0]) => {
-    const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
-    if (existingItem) {
-      updateQuantity(item.id, existingItem.quantity + 1);
-    } else {
-      setCartItems([...cartItems, {
-        id: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: 1,
-        type: item.type
-      }]);
-    }
-  };
-
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = subtotal > 50 ? 0 : 8.99;
-  const tax = subtotal * 0.08;
-  const total = subtotal + shipping + tax;
+  const { subtotal, shipping, tax, total } = getCartTotal();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary">
@@ -123,7 +92,7 @@ const Cart = () => {
                         <p className="text-lg font-bold text-primary">${item.price}</p>
                       </div>
                       <Button 
-                        onClick={() => addToCart(item)}
+                        onClick={() => addToCartHandler(item)}
                         className="w-full"
                         size="sm"
                       >
