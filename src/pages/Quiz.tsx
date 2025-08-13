@@ -498,7 +498,7 @@ const Quiz = () => {
               <Button
                 onClick={nextStep}
                 disabled={!isStepValid() || isSubmitting}
-                className="flex items-center space-x-2 bg-gradient-primary text-white"
+                className="flex items-center space-x-2 bg-gradient-to-r from-primary to-success text-primary-foreground hover:opacity-90 transition-opacity"
               >
                 <span>{currentStep === questions.length - 1 ? 'Get Results' : 'Next'}</span>
                 <ArrowRight className="h-4 w-4" />

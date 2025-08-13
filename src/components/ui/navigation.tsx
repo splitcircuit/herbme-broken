@@ -50,8 +50,10 @@ const Navigation = () => {
 
           {/* Auth and Cart Section */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
-              <ShoppingBag className="h-5 w-5" />
+            <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-primary">
+              <Link to="/cart">
+                <ShoppingBag className="h-5 w-5" />
+              </Link>
             </Button>
             {user ? (
               <Button 
@@ -80,8 +82,10 @@ const Navigation = () => {
 
           {/* Mobile menu and auth buttons */}
           <div className="flex items-center space-x-2 md:hidden">
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              <ShoppingBag className="h-5 w-5" />
+            <Button variant="ghost" size="sm" asChild className="text-muted-foreground">
+              <Link to="/cart">
+                <ShoppingBag className="h-5 w-5" />
+              </Link>
             </Button>
             <Button
               variant="ghost"

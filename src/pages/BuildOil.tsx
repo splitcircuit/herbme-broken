@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -601,8 +602,10 @@ const BuildOil = () => {
                       <Button onClick={saveBlend} variant="outline" className="flex-1">
                         Save My Blend
                       </Button>
-                      <Button className="flex-1 bg-gradient-primary text-white">
-                        Add to Cart
+                      <Button asChild className="flex-1 bg-gradient-to-r from-primary to-success text-primary-foreground hover:opacity-90 transition-opacity">
+                        <Link to="/cart">
+                          Add to Cart
+                        </Link>
                       </Button>
                     </div>
                   </div>
