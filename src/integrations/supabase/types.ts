@@ -161,7 +161,7 @@ export type Database = {
           skincare_frequency: string | null
           skincare_goals: string[] | null
           sun_exposure: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           active_ingredients?: string[] | null
@@ -180,7 +180,7 @@ export type Database = {
           skincare_frequency?: string | null
           skincare_goals?: string[] | null
           sun_exposure?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           active_ingredients?: string[] | null
@@ -199,7 +199,7 @@ export type Database = {
           skincare_frequency?: string | null
           skincare_goals?: string[] | null
           sun_exposure?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
