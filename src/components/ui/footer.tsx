@@ -53,12 +53,16 @@ const Footer = () => {
                   herbmecontact@gmail.com
                 </a>
               </div>
-              <div className="flex space-x-2">
-                <Button variant="ghost" size="sm" className="p-2 h-auto" asChild>
-                  <a href="https://www.instagram.com/herbmeofficial/" target="_blank" rel="noopener noreferrer">
-                    <Instagram className="h-4 w-4" />
-                  </a>
-                </Button>
+              <div className="flex items-center space-x-2">
+                <Instagram className="h-4 w-4 text-muted-foreground" />
+                <a 
+                  href="https://www.instagram.com/herbmeofficial/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-muted-foreground hover:text-primary transition-smooth"
+                >
+                  @HerbMeOfficial
+                </a>
               </div>
             </div>
           </div>
