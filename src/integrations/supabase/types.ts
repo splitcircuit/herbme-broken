@@ -64,6 +64,7 @@ export type Database = {
           id: string
           image_url: string | null
           ingredients: string[] | null
+          inventory_quantity: number
           is_active: boolean | null
           name: string
           price: number | null
@@ -77,6 +78,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           ingredients?: string[] | null
+          inventory_quantity?: number
           is_active?: boolean | null
           name: string
           price?: number | null
@@ -90,6 +92,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           ingredients?: string[] | null
+          inventory_quantity?: number
           is_active?: boolean | null
           name?: string
           price?: number | null
