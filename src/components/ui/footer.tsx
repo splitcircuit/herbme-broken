@@ -45,12 +45,12 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Turks & Caicos Islands</span>
+                <span className="text-sm text-muted-foreground">Providenciales, Turks and Caicos Islands</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <a href="mailto:hello@herbme.com" className="text-sm text-muted-foreground hover:text-primary transition-smooth">
-                  hello@herbme.com
+                <a href="mailto:herbmecontact@gmail.com" className="text-sm text-muted-foreground hover:text-primary transition-smooth">
+                  herbmecontact@gmail.com
                 </a>
               </div>
               <div className="flex space-x-2">

@@ -77,9 +77,8 @@ const Contact = () => {
                     <div>
                       <h3 className="font-semibold mb-1">Location</h3>
                       <p className="text-muted-foreground">
-                        Turks & Caicos Islands
-                        <br />
-                        Caribbean Paradise
+                        Providenciales<br />
+                        Turks and Caicos Islands
                       </p>
                     </div>
                   </div>
@@ -88,10 +87,10 @@ const Contact = () => {
                     <div>
                       <h3 className="font-semibold mb-1">Email</h3>
                       <a 
-                        href="mailto:hello@herbme.com" 
+                        href="mailto:herbmecontact@gmail.com" 
                         className="text-muted-foreground hover:text-primary transition-smooth"
                       >
-                        hello@herbme.com
+                        herbmecontact@gmail.com
                       </a>
                     </div>
                   </div>
@@ -100,10 +99,10 @@ const Contact = () => {
                     <div>
                       <h3 className="font-semibold mb-1">Phone</h3>
                       <a 
-                        href="tel:+1649123456" 
+                        href="tel:6492461597" 
                         className="text-muted-foreground hover:text-primary transition-smooth"
                       >
-                        +1 (649) 123-4567
+                        (649) 246-1597
                       </a>
                     </div>
                   </div>
