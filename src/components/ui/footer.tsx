@@ -54,8 +54,10 @@ const Footer = () => {
                 </a>
               </div>
               <div className="flex space-x-2">
-                <Button variant="ghost" size="sm" className="p-2 h-auto">
-                  <Instagram className="h-4 w-4" />
+                <Button variant="ghost" size="sm" className="p-2 h-auto" asChild>
+                  <a href="https://www.instagram.com/herbmeofficial/" target="_blank" rel="noopener noreferrer">
+                    <Instagram className="h-4 w-4" />
+                  </a>
                 </Button>
               </div>
             </div>
