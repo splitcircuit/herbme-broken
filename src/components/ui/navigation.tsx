@@ -1,14 +1,17 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Menu, X, ShoppingBag, User, LogOut } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Menu, X, ShoppingBag, User, LogOut, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "next-themes";
 
 const Navigation = () => {
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   const navItems = [
     { name: "Shop", path: "/shop" },
@@ -55,6 +58,17 @@ const Navigation = () => {
                 <ShoppingBag className="h-5 w-5" />
               </Link>
             </Button>
+            
+            {/* Dark Mode Toggle */}
+            <div className="flex items-center space-x-2">
+              <Sun className="h-4 w-4 text-muted-foreground" />
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                className="data-[state=checked]:bg-herb-deep-green"
+              />
+              <Moon className="h-4 w-4 text-muted-foreground" />
+            </div>
             {user ? (
               <Button 
                 variant="ghost" 
@@ -87,6 +101,17 @@ const Navigation = () => {
                 <ShoppingBag className="h-5 w-5" />
               </Link>
             </Button>
+            
+            {/* Mobile Dark Mode Toggle */}
+            <div className="flex items-center space-x-1">
+              <Sun className="h-3 w-3 text-muted-foreground" />
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                className="data-[state=checked]:bg-herb-deep-green scale-75"
+              />
+              <Moon className="h-3 w-3 text-muted-foreground" />
+            </div>
             <Button
               variant="ghost"
               size="sm"
