@@ -2,27 +2,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingBag, Minus, Plus, Trash2, MapPin, CreditCard, FileText } from "lucide-react";
-import { useState } from "react";
+import { ShoppingBag, Minus, Plus, Trash2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useLocationDetection } from "@/components/shop/LocationDetector";
-import { OrderRequestForm } from "@/components/shop/OrderRequestForm";
 import { LocationConfirmationBar } from "@/components/shop/LocationConfirmationBar";
-import { BankTransferModal } from "@/components/shop/BankTransferModal";
 
 const Cart = () => {
+  const navigate = useNavigate();
   const { cartItems, addToCart, updateQuantity, removeItem, getCartTotal } = useCart();
   const { 
-    isTurksAndCaicos, 
-    country, 
-    isLoading, 
+    isTurksAndCaicos,
+    country,
+    isLoading,
     showConfirmationBar, 
     confirmLocation, 
     updateLocation, 
     dismissConfirmationBar 
   } = useLocationDetection();
-  const [showOrderForm, setShowOrderForm] = useState(false);
-  const [showBankTransfer, setShowBankTransfer] = useState(false);
 
   // Recommended items that users can add manually
   const recommendedItems = [
@@ -197,18 +194,6 @@ const Cart = () => {
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  {/* Location Badge */}
-                  <div className="mb-4">
-                    <Badge 
-                      variant={isTurksAndCaicos ? "default" : "outline"} 
-                      className="flex items-center gap-1 w-fit"
-                    >
-                      <MapPin className="h-3 w-3" />
-                      {isLoading ? 'Detecting location...' : country}
-                      {isTurksAndCaicos && <span className="ml-1">• Local Customer</span>}
-                    </Badge>
-                  </div>
-                  
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span>${subtotal.toFixed(2)}</span>
@@ -233,70 +218,15 @@ const Cart = () => {
                     </p>
                   )}
 
-                  {/* Checkout Buttons - Different based on location */}
-                  <div className="space-y-2">
-                    {isTurksAndCaicos ? (
-                      <>
-                        {/* Primary: Request Order for T&C customers */}
-                        <Button 
-                          className="w-full" 
-                          size="lg"
-                          onClick={() => setShowOrderForm(true)}
-                        >
-                          <FileText className="mr-2 h-4 w-4" />
-                          Request Order
-                        </Button>
-                        
-                        {/* Secondary: Bank Transfer - preferred for T&C */}
-                        <Button 
-                          variant="outline" 
-                          className="w-full" 
-                          size="lg"
-                          onClick={() => setShowBankTransfer(true)}
-                        >
-                          <FileText className="mr-2 h-4 w-4" />
-                          Bank Transfer
-                        </Button>
-                        
-                        {/* Tertiary: Pay Now option for gifts/vacation */}
-                        <Button 
-                          variant="outline" 
-                          className="w-full" 
-                          size="lg"
-                          onClick={() => {
-                            // TODO: Integrate Stripe for immediate payment
-                            console.log('Redirect to Stripe payment');
-                          }}
-                        >
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          Pay Now
-                        </Button>
-                        
-                        <p className="text-xs text-muted-foreground text-center">
-                          Local delivery available • Bank transfer preferred • Online payment option
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        {/* Primary: Pay Now for international customers */}
-                        <Button 
-                          className="w-full" 
-                          size="lg"
-                          onClick={() => {
-                            // TODO: Integrate Stripe for immediate payment
-                            console.log('Redirect to Stripe payment');
-                          }}
-                        >
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          Pay Now
-                        </Button>
-                        
-                        <p className="text-xs text-muted-foreground text-center">
-                          International shipping • Secure online payment
-                        </p>
-                      </>
-                    )}
-                  </div>
+                  {/* Single Checkout Button */}
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => navigate('/checkout')}
+                  >
+                    <ShoppingBag className="mr-2 h-4 w-4" />
+                    Checkout
+                  </Button>
                   
                   <Button variant="ghost" className="w-full" asChild>
                     <a href="/shop">Continue Shopping</a>
@@ -307,19 +237,6 @@ const Cart = () => {
           </div>
         )}
         
-        {/* Order Request Form Modal */}
-        <OrderRequestForm 
-          isOpen={showOrderForm} 
-          onClose={() => setShowOrderForm(false)} 
-        />
-        
-        {/* Bank Transfer Modal */}
-        <BankTransferModal 
-          isOpen={showBankTransfer} 
-          onClose={() => setShowBankTransfer(false)}
-          orderTotal={total}
-          orderNumber={`ORD-${Date.now()}`}
-        />
       </div>
     </div>
   );

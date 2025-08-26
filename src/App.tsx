@@ -15,6 +15,7 @@ import { LocationProvider } from "@/components/shop/LocationDetector";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
 import Quiz from "./pages/Quiz";
 import BuildOil from "./pages/BuildOil";
 import Product from "./pages/Product";
@@ -45,6 +46,7 @@ const App = () => (
                   <Route path="/" element={<Index />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/quiz" element={
                     <ProtectedRoute>
