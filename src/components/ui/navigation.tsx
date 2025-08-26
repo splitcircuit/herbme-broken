@@ -60,7 +60,7 @@ const Navigation = () => {
             </Button>
             
             {/* Dark Mode Toggle */}
-            <div className="flex items-center space-x-2 animate-nudge">
+            <div className="flex items-center space-x-2 animate-breathe">
               <Sun className="h-4 w-4 text-muted-foreground" />
               <Switch
                 checked={theme === "dark"}
@@ -103,7 +103,7 @@ const Navigation = () => {
             </Button>
             
             {/* Mobile Dark Mode Toggle */}
-            <div className="flex items-center space-x-1 animate-nudge">
+            <div className="flex items-center space-x-1 animate-breathe">
               <Sun className="h-3 w-3 text-muted-foreground" />
               <Switch
                 checked={theme === "dark"}
