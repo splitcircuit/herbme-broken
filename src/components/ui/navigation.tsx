@@ -65,7 +65,7 @@ const Navigation = () => {
               <Switch
                 checked={theme === "dark"}
                 onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-                className="data-[state=checked]:bg-herb-deep-green"
+                className="data-[state=checked]:bg-herb-deep-green [&>span]:animate-switch-slide"
               />
               <Moon className="h-4 w-4 text-muted-foreground" />
             </div>
@@ -108,7 +108,7 @@ const Navigation = () => {
               <Switch
                 checked={theme === "dark"}
                 onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-                className="data-[state=checked]:bg-herb-deep-green scale-75"
+                className="data-[state=checked]:bg-herb-deep-green scale-75 [&>span]:animate-switch-slide"
               />
               <Moon className="h-3 w-3 text-muted-foreground" />
             </div>
