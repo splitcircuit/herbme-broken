@@ -210,7 +210,10 @@ const Shop = () => {
                 <p className="text-muted-foreground mb-6">
                   Save products you love for later by clicking the heart icon.
                 </p>
-                <Button onClick={() => document.querySelector('[value="all-products"]')?.click()}>
+                <Button onClick={() => {
+                  const tab = document.querySelector('[value="all-products"]') as HTMLElement;
+                  tab?.click();
+                }}>
                   Browse Products
                 </Button>
               </div>
@@ -232,7 +235,10 @@ const Shop = () => {
                 <p className="text-muted-foreground mb-6">
                   Products you've recently viewed will appear here.
                 </p>
-                <Button onClick={() => document.querySelector('[value="all-products"]')?.click()}>
+                <Button onClick={() => {
+                  const tab = document.querySelector('[value="all-products"]') as HTMLElement;
+                  tab?.click();
+                }}>
                   Browse Products
                 </Button>
               </div>

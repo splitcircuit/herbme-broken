@@ -7,13 +7,51 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
   }
   public: {
     Tables: {
+      batches: {
+        Row: {
+          batch_code: string
+          expiry_date: string | null
+          id: string
+          manufacture_date: string | null
+          notes: string | null
+          product_id: string | null
+          quantity_produced: number | null
+        }
+        Insert: {
+          batch_code: string
+          expiry_date?: string | null
+          id?: string
+          manufacture_date?: string | null
+          notes?: string | null
+          product_id?: string | null
+          quantity_produced?: number | null
+        }
+        Update: {
+          batch_code?: string
+          expiry_date?: string | null
+          id?: string
+          manufacture_date?: string | null
+          notes?: string | null
+          product_id?: string | null
+          quantity_produced?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batches_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       custom_oil_blends: {
         Row: {
           base_oils: Json
@@ -55,6 +93,231 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      inventory_movements: {
+        Row: {
+          created_at: string | null
+          id: string
+          movement_type: string | null
+          product_id: string | null
+          quantity: number
+          reference: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          movement_type?: string | null
+          product_id?: string | null
+          quantity: number
+          reference?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          movement_type?: string | null
+          product_id?: string | null
+          quantity?: number
+          reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_movements_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          admin_notes: string | null
+          billing_address: Json | null
+          confirmed_at: string | null
+          created_at: string
+          currency: string | null
+          customer_location: string | null
+          delivered_at: string | null
+          delivery_method: string | null
+          delivery_notes: string | null
+          email: string
+          estimated_delivery: string | null
+          first_name: string
+          id: string
+          items: Json
+          last_name: string
+          order_number: string
+          order_type: string
+          payment_method: string | null
+          payment_status: string
+          phone: string | null
+          shipped_at: string | null
+          shipping_address: Json
+          shipping_cost: number | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          subtotal: number
+          tax_amount: number | null
+          total_amount: number
+          tracking_number: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          billing_address?: Json | null
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string | null
+          customer_location?: string | null
+          delivered_at?: string | null
+          delivery_method?: string | null
+          delivery_notes?: string | null
+          email: string
+          estimated_delivery?: string | null
+          first_name: string
+          id?: string
+          items: Json
+          last_name: string
+          order_number?: string
+          order_type: string
+          payment_method?: string | null
+          payment_status?: string
+          phone?: string | null
+          shipped_at?: string | null
+          shipping_address: Json
+          shipping_cost?: number | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          subtotal?: number
+          tax_amount?: number | null
+          total_amount?: number
+          tracking_number?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          billing_address?: Json | null
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string | null
+          customer_location?: string | null
+          delivered_at?: string | null
+          delivery_method?: string | null
+          delivery_notes?: string | null
+          email?: string
+          estimated_delivery?: string | null
+          first_name?: string
+          id?: string
+          items?: Json
+          last_name?: string
+          order_number?: string
+          order_type?: string
+          payment_method?: string | null
+          payment_status?: string
+          phone?: string | null
+          shipped_at?: string | null
+          shipping_address?: Json
+          shipping_cost?: number | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          subtotal?: number
+          tax_amount?: number | null
+          total_amount?: number
+          tracking_number?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      product_details: {
+        Row: {
+          id: string
+          ingredients: string | null
+          packaging_color: string | null
+          packaging_material: string | null
+          product_id: string | null
+          scent: string | null
+          shelf_life_months: number | null
+          size_ml: number | null
+          storage_instructions: string | null
+          texture: string | null
+          usage_instructions: string | null
+          warnings: string | null
+        }
+        Insert: {
+          id?: string
+          ingredients?: string | null
+          packaging_color?: string | null
+          packaging_material?: string | null
+          product_id?: string | null
+          scent?: string | null
+          shelf_life_months?: number | null
+          size_ml?: number | null
+          storage_instructions?: string | null
+          texture?: string | null
+          usage_instructions?: string | null
+          warnings?: string | null
+        }
+        Update: {
+          id?: string
+          ingredients?: string | null
+          packaging_color?: string | null
+          packaging_material?: string | null
+          product_id?: string | null
+          scent?: string | null
+          shelf_life_months?: number | null
+          size_ml?: number | null
+          storage_instructions?: string | null
+          texture?: string | null
+          usage_instructions?: string | null
+          warnings?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_details_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_media: {
+        Row: {
+          alt_text: string | null
+          id: string
+          media_type: string | null
+          media_url: string
+          product_id: string | null
+        }
+        Insert: {
+          alt_text?: string | null
+          id?: string
+          media_type?: string | null
+          media_url: string
+          product_id?: string | null
+        }
+        Update: {
+          alt_text?: string | null
+          id?: string
+          media_type?: string | null
+          media_url?: string
+          product_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_media_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       products: {
         Row: {
