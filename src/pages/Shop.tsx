@@ -19,6 +19,7 @@ type SortOption = 'name' | 'price-low' | 'price-high' | 'rating' | 'new';
 const Shop = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('name');
+  const [activeTab, setActiveTab] = useState('all-products');
   
   const { 
     filter, 
@@ -100,7 +101,7 @@ const Shop = () => {
           )}
         </div>
 
-        <Tabs defaultValue="all-products" className="space-y-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="all-products">All Products</TabsTrigger>
             <TabsTrigger value="wishlist" className="flex items-center gap-2">
@@ -210,10 +211,7 @@ const Shop = () => {
                 <p className="text-muted-foreground mb-6">
                   Save products you love for later by clicking the heart icon.
                 </p>
-                <Button onClick={() => {
-                  const tab = document.querySelector('[value="all-products"]') as HTMLElement;
-                  tab?.click();
-                }}>
+                <Button onClick={() => setActiveTab('all-products')}>
                   Browse Products
                 </Button>
               </div>
@@ -235,10 +233,7 @@ const Shop = () => {
                 <p className="text-muted-foreground mb-6">
                   Products you've recently viewed will appear here.
                 </p>
-                <Button onClick={() => {
-                  const tab = document.querySelector('[value="all-products"]') as HTMLElement;
-                  tab?.click();
-                }}>
+                <Button onClick={() => setActiveTab('all-products')}>
                   Browse Products
                 </Button>
               </div>
