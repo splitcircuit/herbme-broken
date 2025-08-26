@@ -8,6 +8,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useLocationDetection } from "@/components/shop/LocationDetector";
 import { OrderRequestForm } from "@/components/shop/OrderRequestForm";
 import { LocationConfirmationBar } from "@/components/shop/LocationConfirmationBar";
+import { BankTransferModal } from "@/components/shop/BankTransferModal";
 
 const Cart = () => {
   const { cartItems, addToCart, updateQuantity, removeItem, getCartTotal } = useCart();
@@ -21,6 +22,7 @@ const Cart = () => {
     dismissConfirmationBar 
   } = useLocationDetection();
   const [showOrderForm, setShowOrderForm] = useState(false);
+  const [showBankTransfer, setShowBankTransfer] = useState(false);
 
   // Recommended items that users can add manually
   const recommendedItems = [
@@ -278,15 +280,15 @@ const Cart = () => {
                           Pay Now
                         </Button>
                         
-                        {/* Secondary: Request Quote */}
+                        {/* Secondary: Bank Transfer */}
                         <Button 
                           variant="outline" 
                           className="w-full" 
                           size="lg"
-                          onClick={() => setShowOrderForm(true)}
+                          onClick={() => setShowBankTransfer(true)}
                         >
                           <FileText className="mr-2 h-4 w-4" />
-                          Request Quote
+                          Bank Transfer
                         </Button>
                         
                         <p className="text-xs text-muted-foreground text-center">
@@ -309,6 +311,14 @@ const Cart = () => {
         <OrderRequestForm 
           isOpen={showOrderForm} 
           onClose={() => setShowOrderForm(false)} 
+        />
+        
+        {/* Bank Transfer Modal */}
+        <BankTransferModal 
+          isOpen={showBankTransfer} 
+          onClose={() => setShowBankTransfer(false)}
+          orderTotal={total}
+          orderNumber={`ORD-${Date.now()}`}
         />
       </div>
     </div>
