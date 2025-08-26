@@ -30,15 +30,6 @@ const orderSchema = z.object({
   deliveryMethod: z.enum(['local_delivery', 'pickup', 'shipping']),
   deliveryNotes: z.string().optional(),
   paymentPreference: z.enum(['pay_now', 'bank_transfer', 'cash_on_delivery']),
-  bankTransferConfirmed: z.boolean().optional(),
-}).refine((data) => {
-  if (data.paymentPreference === 'bank_transfer') {
-    return data.bankTransferConfirmed === true;
-  }
-  return true;
-}, {
-  message: "Please confirm you have sent the bank transfer",
-  path: ["bankTransferConfirmed"],
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -62,7 +53,6 @@ const Checkout = () => {
       country: country || (isTurksAndCaicos ? 'Turks and Caicos' : ''),
       deliveryMethod: isTurksAndCaicos ? 'local_delivery' : 'shipping',
       paymentPreference: isTurksAndCaicos ? 'cash_on_delivery' : 'bank_transfer',
-      bankTransferConfirmed: false,
     }
   });
 
@@ -434,42 +424,18 @@ const Checkout = () => {
                           )}
                         />
 
-                        {/* Bank Transfer Details */}
+                        {/* Bank Transfer Notice */}
                         {selectedPaymentPreference === 'bank_transfer' && (
-                          <div className="mt-4 space-y-4">
-                            <div className="p-4 bg-muted/50 rounded-lg">
-                              <h4 className="font-medium mb-2">Bank Transfer Details</h4>
-                              <div className="text-sm space-y-1">
-                                <p><strong>Bank:</strong> First Caribbean International Bank</p>
-                                <p><strong>Account Name:</strong> Conch Co. Ltd</p>
-                                <p><strong>Account Number:</strong> 123456789</p>
-                                <p><strong>Routing Number:</strong> 987654321</p>
-                                <p className="text-muted-foreground mt-2">
-                                  Please include your order number in the transfer reference.
-                                </p>
-                              </div>
+                          <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                            <div className="space-y-2">
+                              <h4 className="font-medium text-sm flex items-center gap-2">
+                                <CreditCard className="h-4 w-4" />
+                                Bank Transfer Selected
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                After submitting your order, you'll receive complete bank transfer details with your order number for payment reference.
+                              </p>
                             </div>
-                            
-                            <FormField
-                              control={form.control}
-                              name="bankTransferConfirmed"
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                    />
-                                  </FormControl>
-                                  <div className="space-y-1 leading-none">
-                                    <FormLabel>
-                                      I confirm that I have sent the bank transfer
-                                    </FormLabel>
-                                    <FormMessage />
-                                  </div>
-                                </FormItem>
-                              )}
-                            />
                           </div>
                         )}
                       </div>
@@ -477,11 +443,7 @@ const Checkout = () => {
                       <Button 
                         type="submit" 
                         className="w-full"
-                        disabled={
-                          isSubmitting || 
-                          cartItems.length === 0 || 
-                          (selectedPaymentPreference === 'bank_transfer' && !form.watch('bankTransferConfirmed'))
-                        }
+                        disabled={isSubmitting || cartItems.length === 0}
                       >
                         {isSubmitting ? 'Submitting...' : 
                          selectedPaymentPreference === 'pay_now' ? 'Submit Order & Pay' : 
