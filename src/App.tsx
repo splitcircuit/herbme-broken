@@ -9,6 +9,8 @@ import Footer from "@/components/ui/footer";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { CartProvider } from "@/contexts/CartContext";
+import { WishlistProvider } from "@/contexts/WishlistContext";
+import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
@@ -32,7 +34,9 @@ const App = () => (
         <BrowserRouter>
         <AuthProvider>
           <CartProvider>
-            <div className="min-h-screen flex flex-col">
+            <WishlistProvider>
+              <RecentlyViewedProvider>
+                <div className="min-h-screen flex flex-col">
               <Navigation />
               <main className="flex-1">
                 <Routes>
@@ -59,7 +63,9 @@ const App = () => (
                 </Routes>
               </main>
               <Footer />
-            </div>
+                </div>
+              </RecentlyViewedProvider>
+            </WishlistProvider>
           </CartProvider>
         </AuthProvider>
       </BrowserRouter>
