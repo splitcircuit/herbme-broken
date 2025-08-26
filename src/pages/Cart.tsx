@@ -247,7 +247,18 @@ const Cart = () => {
                           Request Order
                         </Button>
                         
-                        {/* Secondary: Pay Now option */}
+                        {/* Secondary: Bank Transfer - preferred for T&C */}
+                        <Button 
+                          variant="outline" 
+                          className="w-full" 
+                          size="lg"
+                          onClick={() => setShowBankTransfer(true)}
+                        >
+                          <FileText className="mr-2 h-4 w-4" />
+                          Bank Transfer
+                        </Button>
+                        
+                        {/* Tertiary: Pay Now option for gifts/vacation */}
                         <Button 
                           variant="outline" 
                           className="w-full" 
@@ -258,11 +269,11 @@ const Cart = () => {
                           }}
                         >
                           <CreditCard className="mr-2 h-4 w-4" />
-                          Pay Online Now
+                          Pay Now
                         </Button>
                         
                         <p className="text-xs text-muted-foreground text-center">
-                          Local delivery available • Cash on delivery option
+                          Local delivery available • Bank transfer preferred • Online payment option
                         </p>
                       </>
                     ) : (
@@ -278,17 +289,6 @@ const Cart = () => {
                         >
                           <CreditCard className="mr-2 h-4 w-4" />
                           Pay Now
-                        </Button>
-                        
-                        {/* Secondary: Bank Transfer */}
-                        <Button 
-                          variant="outline" 
-                          className="w-full" 
-                          size="lg"
-                          onClick={() => setShowBankTransfer(true)}
-                        >
-                          <FileText className="mr-2 h-4 w-4" />
-                          Bank Transfer
                         </Button>
                         
                         <p className="text-xs text-muted-foreground text-center">
