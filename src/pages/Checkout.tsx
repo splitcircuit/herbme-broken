@@ -134,15 +134,10 @@ const Checkout = () => {
         throw error;
       }
 
-      // Clear cart and show success
+      // Clear cart and navigate to confirmation
       clearCart();
       
-      toast({
-        title: "Order Submitted Successfully!",
-        description: `Order #${order.order_number} has been submitted. We'll contact you soon with next steps.`
-      });
-
-      navigate('/');
+      navigate(`/order-confirmation/${order.order_number}`);
 
       // If paying now, redirect to payment (would need Stripe integration)
       if (data.paymentPreference === 'pay_now') {
