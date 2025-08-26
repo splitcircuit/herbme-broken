@@ -11,6 +11,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
+import { LocationProvider } from "@/components/shop/LocationDetector";
 import Index from "./pages/Index";
 import Shop from "./pages/Shop";
 import Cart from "./pages/Cart";
@@ -33,9 +34,10 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
         <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <RecentlyViewedProvider>
+          <LocationProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <RecentlyViewedProvider>
                 <div className="min-h-screen flex flex-col">
               <Navigation />
               <main className="flex-1">
@@ -64,9 +66,10 @@ const App = () => (
               </main>
               <Footer />
                 </div>
-              </RecentlyViewedProvider>
-            </WishlistProvider>
-          </CartProvider>
+                </RecentlyViewedProvider>
+              </WishlistProvider>
+            </CartProvider>
+          </LocationProvider>
         </AuthProvider>
       </BrowserRouter>
       </TooltipProvider>

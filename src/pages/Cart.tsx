@@ -7,10 +7,19 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useLocationDetection } from "@/components/shop/LocationDetector";
 import { OrderRequestForm } from "@/components/shop/OrderRequestForm";
+import { LocationConfirmationBar } from "@/components/shop/LocationConfirmationBar";
 
 const Cart = () => {
   const { cartItems, addToCart, updateQuantity, removeItem, getCartTotal } = useCart();
-  const { isTurksAndCaicos, country, isLoading } = useLocationDetection();
+  const { 
+    isTurksAndCaicos, 
+    country, 
+    isLoading, 
+    showConfirmationBar, 
+    confirmLocation, 
+    updateLocation, 
+    dismissConfirmationBar 
+  } = useLocationDetection();
   const [showOrderForm, setShowOrderForm] = useState(false);
 
   // Recommended items that users can add manually
@@ -60,6 +69,20 @@ const Cart = () => {
           <ShoppingBag className="h-8 w-8 text-primary mr-3" />
           <h1 className="text-3xl font-bold text-foreground">Shopping Cart</h1>
         </div>
+
+        {/* Location Confirmation Bar */}
+        <LocationConfirmationBar
+          detectedLocation={{
+            country,
+            region: '',
+            isTurksAndCaicos
+          }}
+          isLoading={isLoading}
+          onLocationConfirm={(location) => confirmLocation(location)}
+          onLocationChange={(location) => updateLocation(location)}
+          isVisible={showConfirmationBar}
+          onDismiss={dismissConfirmationBar}
+        />
 
         {cartItems.length === 0 ? (
           <div className="space-y-8">
