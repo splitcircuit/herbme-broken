@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, MapPin, CreditCard, Package } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -28,7 +29,16 @@ const orderSchema = z.object({
   country: z.string().min(1, 'Country is required'),
   deliveryMethod: z.enum(['local_delivery', 'pickup', 'shipping']),
   deliveryNotes: z.string().optional(),
-  paymentPreference: z.enum(['pay_now', 'request_quote', 'cash_on_delivery']),
+  paymentPreference: z.enum(['pay_now', 'bank_transfer', 'cash_on_delivery']),
+  bankTransferConfirmed: z.boolean().optional(),
+}).refine((data) => {
+  if (data.paymentPreference === 'bank_transfer') {
+    return data.bankTransferConfirmed === true;
+  }
+  return true;
+}, {
+  message: "Please confirm you have sent the bank transfer",
+  path: ["bankTransferConfirmed"],
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -51,7 +61,8 @@ const Checkout = () => {
     defaultValues: {
       country: country || (isTurksAndCaicos ? 'Turks and Caicos' : ''),
       deliveryMethod: isTurksAndCaicos ? 'local_delivery' : 'shipping',
-      paymentPreference: isTurksAndCaicos ? 'cash_on_delivery' : 'request_quote',
+      paymentPreference: isTurksAndCaicos ? 'cash_on_delivery' : 'bank_transfer',
+      bankTransferConfirmed: false,
     }
   });
 
@@ -154,8 +165,7 @@ const Checkout = () => {
   const getDeliveryOptions = () => {
     if (isTurksAndCaicos) {
       return [
-        { value: 'local_delivery', label: 'Local Delivery (Free for orders $50+)' },
-        { value: 'pickup', label: 'Store Pickup' }
+        { value: 'local_delivery', label: 'Local Delivery (Free for orders $50+)' }
       ];
     } else {
       return [
@@ -166,7 +176,7 @@ const Checkout = () => {
 
   const getPaymentOptions = () => {
     const baseOptions = [
-      { value: 'request_quote', label: 'Request Quote First' }
+      { value: 'bank_transfer', label: 'Bank Transfer' }
     ];
 
     if (isTurksAndCaicos) {
@@ -237,14 +247,14 @@ const Checkout = () => {
                       <div className="space-y-4">
                         <h3 className="font-semibold">Contact Information</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <FormField
+                           <FormField
                             control={form.control}
                             name="firstName"
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>First Name</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <Input placeholder="e.g., John" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -257,7 +267,7 @@ const Checkout = () => {
                               <FormItem>
                                 <FormLabel>Last Name</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <Input placeholder="e.g., Smith" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -271,7 +281,7 @@ const Checkout = () => {
                             <FormItem>
                               <FormLabel>Email</FormLabel>
                               <FormControl>
-                                <Input type="email" {...field} />
+                                <Input type="email" placeholder="e.g., john@example.com" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -284,7 +294,7 @@ const Checkout = () => {
                             <FormItem>
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
-                                <Input {...field} />
+                                <Input placeholder="e.g., (649) 123-4567" {...field} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -302,7 +312,7 @@ const Checkout = () => {
                             <FormItem>
                               <FormLabel>Street Address</FormLabel>
                               <FormControl>
-                                <Textarea {...field} rows={2} />
+                                <Textarea placeholder="e.g., 123 Conch Way, Grace Bay" {...field} rows={2} />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -316,7 +326,7 @@ const Checkout = () => {
                               <FormItem>
                                 <FormLabel>City</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <Input placeholder="e.g., Providenciales" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -329,7 +339,7 @@ const Checkout = () => {
                               <FormItem>
                                 <FormLabel>Postal Code</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <Input placeholder="e.g., TKCA 1ZZ" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -342,7 +352,7 @@ const Checkout = () => {
                               <FormItem>
                                 <FormLabel>Country</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <Input placeholder="Turks and Caicos" {...field} />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -430,18 +440,41 @@ const Checkout = () => {
                         />
 
                         {/* Bank Transfer Details */}
-                        {selectedPaymentPreference === 'request_quote' && (
-                          <div className="mt-4 p-4 bg-muted/50 rounded-lg">
-                            <h4 className="font-medium mb-2">Bank Transfer Details</h4>
-                            <div className="text-sm space-y-1">
-                              <p><strong>Bank:</strong> First Caribbean International Bank</p>
-                              <p><strong>Account Name:</strong> Conch Co. Ltd</p>
-                              <p><strong>Account Number:</strong> 123456789</p>
-                              <p><strong>Routing Number:</strong> 987654321</p>
-                              <p className="text-muted-foreground mt-2">
-                                Please include your order number in the transfer reference.
-                              </p>
+                        {selectedPaymentPreference === 'bank_transfer' && (
+                          <div className="mt-4 space-y-4">
+                            <div className="p-4 bg-muted/50 rounded-lg">
+                              <h4 className="font-medium mb-2">Bank Transfer Details</h4>
+                              <div className="text-sm space-y-1">
+                                <p><strong>Bank:</strong> First Caribbean International Bank</p>
+                                <p><strong>Account Name:</strong> Conch Co. Ltd</p>
+                                <p><strong>Account Number:</strong> 123456789</p>
+                                <p><strong>Routing Number:</strong> 987654321</p>
+                                <p className="text-muted-foreground mt-2">
+                                  Please include your order number in the transfer reference.
+                                </p>
+                              </div>
                             </div>
+                            
+                            <FormField
+                              control={form.control}
+                              name="bankTransferConfirmed"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                    />
+                                  </FormControl>
+                                  <div className="space-y-1 leading-none">
+                                    <FormLabel>
+                                      I confirm that I have sent the bank transfer
+                                    </FormLabel>
+                                    <FormMessage />
+                                  </div>
+                                </FormItem>
+                              )}
+                            />
                           </div>
                         )}
                       </div>
@@ -449,10 +482,15 @@ const Checkout = () => {
                       <Button 
                         type="submit" 
                         className="w-full"
-                        disabled={isSubmitting || cartItems.length === 0}
+                        disabled={
+                          isSubmitting || 
+                          cartItems.length === 0 || 
+                          (selectedPaymentPreference === 'bank_transfer' && !form.watch('bankTransferConfirmed'))
+                        }
                       >
                         {isSubmitting ? 'Submitting...' : 
                          selectedPaymentPreference === 'pay_now' ? 'Submit Order & Pay' : 
+                         selectedPaymentPreference === 'bank_transfer' ? 'Submit Order (Bank Transfer)' :
                          'Submit Order Request'}
                       </Button>
                     </form>
