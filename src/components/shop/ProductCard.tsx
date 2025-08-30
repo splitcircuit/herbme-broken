@@ -146,7 +146,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                     className="h-8 px-3 text-xs bg-secondary hover:bg-secondary/90 text-secondary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                     disabled={!product.inStock}
                   >
-                    Add
+                    Add to Cart
                   </Button>
                 </div>
               )}
