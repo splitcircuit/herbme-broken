@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Mail, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AnimatedLogo } from "@/components/ui/animated-logo";
-import { FlowingLine } from "@/components/ui/flowing-line";
 
 const Footer = () => {
   return (
@@ -11,13 +9,9 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="space-y-3">
-              <FlowingLine className="w-16" animated />
-              <Link to="/" className="block">
-                <AnimatedLogo variant="footer" />
-              </Link>
-              <FlowingLine className="w-16" animated />
-            </div>
+            <Link to="/" className="font-heading text-2xl font-bold text-brand-green">
+              HerbMe
+            </Link>
             <p className="text-sm text-muted-foreground">
               Island-born. Plant-powered. Handmade natural skincare from Turks & Caicos Islands.
             </p>

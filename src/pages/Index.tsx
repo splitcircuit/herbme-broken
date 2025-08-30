@@ -2,16 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Star, Award, Heart } from "lucide-react";
+import { Star, Leaf, Heart, Award } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-skincare.jpg";
 import product1 from "@/assets/product-1.jpg";
 import product2 from "@/assets/product-2.jpg";
 import product3 from "@/assets/product-3.jpg";
 import islandStory from "@/assets/island-story.jpg";
-import { LeafIcon } from "@/components/ui/leaf-icon";
-import { AnimatedLogo } from "@/components/ui/animated-logo";
-import { FlowingLine } from "@/components/ui/flowing-line";
 
 const Index = () => {
   const featuredProducts = [
@@ -39,7 +36,7 @@ const Index = () => {
   ];
 
   const benefits = [
-    { icon: LeafIcon, title: "100% Natural", description: "Pure plant-based ingredients" },
+    { icon: Leaf, title: "100% Natural", description: "Pure plant-based ingredients" },
     { icon: Heart, title: "Handcrafted", description: "Made with love in small batches" },
     { icon: Award, title: "Island Fresh", description: "Harvested from Turks & Caicos" }
   ];
@@ -69,11 +66,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[80vh] py-12">
             <div className="space-y-8">
-              <div className="space-y-6">
-                <div className="flex items-center justify-center lg:justify-start">
-                  <AnimatedLogo variant="hero" showAnimation />
-                </div>
-                <FlowingLine className="w-24 mx-auto lg:mx-0" animated />
+              <div>
                 <Badge variant="secondary" className="mb-4">
                   Handmade in Turks & Caicos
                 </Badge>

@@ -3,9 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, Leaf, Sun } from "lucide-react";
-import { LeafIcon } from "@/components/ui/leaf-icon";
-import { FlowingLine } from "@/components/ui/flowing-line";
+import { Star, Leaf, Droplets, Sun } from "lucide-react";
 import { useParams, Link } from "react-router-dom";
 import { useEffect } from "react";
 import product1 from "@/assets/product-1.jpg";
@@ -326,14 +324,11 @@ const Product = () => {
             <TabsContent value="ingredients" className="mt-8">
               <Card className="border-0 shadow-natural">
                 <CardContent className="p-8">
-                  <div className="flex items-center space-x-4 mb-6">
-                    <h3 className="text-xl font-heading font-semibold">Natural Ingredients</h3>
-                    <FlowingLine className="flex-1" />
-                  </div>
+                  <h3 className="text-xl font-heading font-semibold mb-4">Natural Ingredients</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {product.ingredients.map((ingredient: string, index: number) => (
                       <div key={index} className="flex items-center space-x-3">
-                        <LeafIcon size="sm" animated color="green" />
+                        <Droplets className="h-4 w-4 text-herb-deep-green" />
                         <span>{ingredient}</span>
                       </div>
                     ))}

@@ -6,7 +6,6 @@ import { Menu, X, ShoppingBag, User, LogOut, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "next-themes";
-import { AnimatedLogo } from "@/components/ui/animated-logo";
 
 const Navigation = () => {
   const location = useLocation();
@@ -30,8 +29,8 @@ const Navigation = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <AnimatedLogo variant="navigation" />
+          <Link to="/" className="font-heading text-2xl font-bold text-brand-green">
+            HerbMe
           </Link>
 
           {/* Desktop Navigation */}
