@@ -3,10 +3,31 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { MapPin, Mail, Phone, Instagram, Clock } from "lucide-react";
+import { MapPin, Mail, Phone, Instagram, Clock, Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 import islandStory from "@/assets/island-story.jpg";
 
 const Contact = () => {
+  const { toast } = useToast();
+  const isMobile = useIsMobile();
+
+  const copyToClipboard = async (text: string, type: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Copied!",
+        description: `${type} copied to clipboard`,
+      });
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -84,26 +105,64 @@ const Contact = () => {
                   </div>
                   <div className="flex items-start space-x-4">
                     <Mail className="h-5 w-5 text-brand-green mt-1" />
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-semibold mb-1">Email</h3>
-                      <a 
-                        href="mailto:herbmecontact@gmail.com" 
-                        className="text-muted-foreground hover:text-primary transition-smooth"
-                      >
-                        herbmecontact@gmail.com
-                      </a>
+                      <div className="flex items-center justify-between group">
+                        {isMobile ? (
+                          <a 
+                            href="mailto:herbmecontact@gmail.com" 
+                            className="text-muted-foreground hover:text-primary transition-smooth"
+                          >
+                            herbmecontact@gmail.com
+                          </a>
+                        ) : (
+                          <button
+                            onClick={() => copyToClipboard("herbmecontact@gmail.com", "Email")}
+                            className="text-muted-foreground hover:text-primary transition-smooth text-left"
+                          >
+                            herbmecontact@gmail.com
+                          </button>
+                        )}
+                        {!isMobile && (
+                          <button
+                            onClick={() => copyToClipboard("herbmecontact@gmail.com", "Email")}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded"
+                          >
+                            <Copy className="h-4 w-4 text-muted-foreground" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
                     <Phone className="h-5 w-5 text-brand-green mt-1" />
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-semibold mb-1">Phone</h3>
-                      <a 
-                        href="tel:6492461597" 
-                        className="text-muted-foreground hover:text-primary transition-smooth"
-                      >
-                        (649) 246-1597
-                      </a>
+                      <div className="flex items-center justify-between group">
+                        {isMobile ? (
+                          <a 
+                            href="tel:6492461597" 
+                            className="text-muted-foreground hover:text-primary transition-smooth"
+                          >
+                            (649) 246-1597
+                          </a>
+                        ) : (
+                          <button
+                            onClick={() => copyToClipboard("6492461597", "Phone number")}
+                            className="text-muted-foreground hover:text-primary transition-smooth text-left"
+                          >
+                            (649) 246-1597
+                          </button>
+                        )}
+                        {!isMobile && (
+                          <button
+                            onClick={() => copyToClipboard("6492461597", "Phone number")}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded"
+                          >
+                            <Copy className="h-4 w-4 text-muted-foreground" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">

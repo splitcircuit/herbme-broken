@@ -96,7 +96,7 @@ const Story = () => {
                   <div className="w-16 h-16 bg-herb-soft-sage rounded-full flex items-center justify-center">
                     <value.icon className="h-8 w-8 text-brand-green" />
                   </div>
-                  <h3 className="text-xl font-heading font-semibold text-brand-brown">
+                  <h3 className="text-xl font-heading font-semibold text-brand-brown dark:text-brand-brown-light">
                     {value.title}
                   </h3>
                   <p className="text-muted-foreground leading-relaxed">

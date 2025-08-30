@@ -53,6 +53,7 @@ All colors MUST be HSL.
     --herb-cocoa-brown: 31 82% 23%;
     --herb-light-green: 111 36% 68%;
     --herb-bright-green: 112 65% 52%;
+    --herb-cocoa-brown-light: 31 45% 75%;
     
     /* Missing color definitions */
     --primary-dark: 118 88% 22%;
@@ -113,6 +114,9 @@ All colors MUST be HSL.
     --input: 118 30% 25%;
     --ring: 112 65% 52%;
 
+    /* Override brand colors for dark mode */
+    --herb-cocoa-brown: 31 45% 75%;
+
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -161,6 +165,10 @@ All colors MUST be HSL.
   
   .text-brand-brown {
     color: hsl(var(--herb-cocoa-brown));
+  }
+
+  .text-brand-brown-light {
+    color: hsl(var(--herb-cocoa-brown-light));
   }
   
   .bg-brand-sage {
