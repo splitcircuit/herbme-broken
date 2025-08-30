@@ -120,24 +120,34 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                 {product.shortDescription}
               </p>
               
-              {/* Rating */}
+              {/* Rating and Quick Add */}
               {product.rating && (
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="flex">
-                    {[...Array(5)].map((_, i) => (
-                      <Star 
-                        key={i} 
-                        className={`h-4 w-4 ${
-                          i < Math.floor(product.rating!) 
-                            ? 'text-yellow-400 fill-current' 
-                             : 'text-muted-foreground'
-                        }`}
-                      />
-                    ))}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex">
+                      {[...Array(5)].map((_, i) => (
+                        <Star 
+                          key={i} 
+                          className={`h-4 w-4 ${
+                            i < Math.floor(product.rating!) 
+                              ? 'text-yellow-400 fill-current' 
+                              : 'text-muted-foreground'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      ({product.reviewCount})
+                    </span>
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    ({product.reviewCount})
-                  </span>
+                  <Button
+                    onClick={handleAddToCart}
+                    size="sm"
+                    className="h-8 px-3 text-xs bg-secondary hover:bg-secondary/90 text-secondary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    disabled={!product.inStock}
+                  >
+                    Add
+                  </Button>
                 </div>
               )}
 
@@ -177,16 +187,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           </CardContent>
         </Link>
 
-        {/* Quick Add to Cart - appears on hover */}
-        <div className="absolute bottom-20 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-2 group-hover:translate-y-0">
-          <Button 
-            onClick={handleAddToCart}
-            className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
-            disabled={!product.inStock}
-          >
-            Quick Add to Cart
-          </Button>
-        </div>
       </Card>
 
       {/* Quick View Dialog */}
