@@ -124,7 +124,7 @@ const BuildOil = () => {
           setAllergens(data.allergies || []);
         }
       } catch (error) {
-        console.log('No previous quiz data found');
+        // No previous quiz data found - this is expected for new users
       }
     };
 

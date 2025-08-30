@@ -132,7 +132,7 @@ const Checkout = () => {
       // If paying now, redirect to payment (would need Stripe integration)
       if (data.paymentPreference === 'pay_now') {
         // TODO: Integrate with Stripe for immediate payment
-        console.log('Redirect to payment for order:', order.id);
+        // Redirect to payment would happen here
       }
 
     } catch (error: any) {
@@ -180,7 +180,7 @@ const Checkout = () => {
 
   const handlePayNow = () => {
     // TODO: Integrate Stripe for immediate payment
-    console.log('Redirect to Stripe payment');
+    // Redirect to Stripe payment would happen here
   };
 
   return (
