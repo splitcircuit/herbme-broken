@@ -103,12 +103,32 @@ export default {
 				'breathe': {
 					'0%, 100%': { transform: 'scale(1)', opacity: '1' },
 					'50%': { transform: 'scale(1.05)', opacity: '0.8' }
+				},
+				'leaf-sway': {
+					'0%, 100%': { transform: 'rotate(-2deg)' },
+					'50%': { transform: 'rotate(2deg)' }
+				},
+				'text-flow': {
+					'0%, 100%': { transform: 'translateY(0px)' },
+					'50%': { transform: 'translateY(-2px)' }
+				},
+				'logo-glow': {
+					'0%, 100%': { filter: 'brightness(1) drop-shadow(0 0 0px transparent)' },
+					'50%': { filter: 'brightness(1.1) drop-shadow(0 0 8px hsl(var(--herb-light-green) / 0.3))' }
+				},
+				'leaf-bounce': {
+					'0%, 100%': { transform: 'translateY(0px) scale(1)' },
+					'50%': { transform: 'translateY(-3px) scale(1.05)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'breathe': 'breathe 3s ease-in-out infinite'
+				'breathe': 'breathe 3s ease-in-out infinite',
+				'leaf-sway': 'leaf-sway 4s ease-in-out infinite',
+				'text-flow': 'text-flow 6s ease-in-out infinite',
+				'logo-glow': 'logo-glow 3s ease-in-out infinite',
+				'leaf-bounce': 'leaf-bounce 2s ease-in-out infinite'
 			}
 		}
 	},
