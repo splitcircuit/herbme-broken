@@ -243,10 +243,10 @@ const Quiz = () => {
   };
 
   const handleSubmit = async () => {
-    if (!user) {
+    if (!user && !quizData.email) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to save your quiz results.",
+        title: "Email Required",
+        description: "Please provide your email to get your quiz results.",
         variant: "destructive",
       });
       return;
@@ -254,10 +254,10 @@ const Quiz = () => {
 
     setIsSubmitting(true);
     try {
-      // Save quiz response with user_id
+      // Save quiz response with user_id if logged in, otherwise just use email
       const quizDataWithUser = {
         ...quizData,
-        user_id: user.id
+        user_id: user?.id || null
       };
 
       const { data: quizResponse, error } = await supabase

@@ -266,8 +266,8 @@ const BuildOil = () => {
   const saveBlend = async () => {
     if (!user) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to save your custom blend.",
+        title: "Email Required",
+        description: "Please provide your email to save your custom blend.",
         variant: "destructive",
       });
       return;
