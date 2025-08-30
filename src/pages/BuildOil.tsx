@@ -348,11 +348,11 @@ const BuildOil = () => {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-heading text-primary-dark">Build Your Custom Oil</h1>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-readable-muted">
               Step {currentStep + 1} of {steps.length}
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-muted rounded-full h-2">
             <div 
               className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
@@ -374,7 +374,7 @@ const BuildOil = () => {
                 {/* Step 0: Choose Base Oils */}
                 {currentStep === 0 && (
                   <div className="space-y-6">
-                    <p className="text-gray-600">Select up to 3 base oils. Adjust percentages with sliders.</p>
+                    <p className="text-readable-muted">Select up to 3 base oils. Adjust percentages with sliders.</p>
                     
                     {/* Selected Oils */}
                     {selectedBaseOils.length > 0 && (
@@ -385,7 +385,7 @@ const BuildOil = () => {
                             <div className="flex justify-between items-center">
                               <span className="font-medium">{oil.name}</span>
                               <div className="flex items-center space-x-2">
-                                <span className="text-sm text-gray-600">{oil.percentage}%</span>
+                                <span className="text-sm text-readable-secondary">{oil.percentage}%</span>
                                 <Button
                                   variant="ghost"
                                   size="sm"
@@ -403,9 +403,9 @@ const BuildOil = () => {
                               step={5}
                               className="w-full"
                             />
-                            <div className="text-xs text-gray-500">
-                              Benefits: {oil.benefits.join(', ')}
-                            </div>
+                             <div className="text-xs text-readable-muted">
+                               Benefits: {oil.benefits.join(', ')}
+                             </div>
                           </div>
                         ))}
                       </div>
@@ -418,13 +418,13 @@ const BuildOil = () => {
                         .filter(oil => !oil.allergens.some(allergen => allergens.includes(allergen)))
                         .map((oil) => (
                         <div key={oil.name} className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
-                          <div className="flex justify-between items-start mb-2">
-                            <h4 className="font-semibold text-gray-900">{oil.name}</h4>
-                            <span className="text-sm text-gray-500">${oil.price_per_ml}/ml</span>
-                          </div>
-                          <p className="text-sm text-gray-600 mb-3">
-                            {oil.benefits.join(', ')}
-                          </p>
+                           <div className="flex justify-between items-start mb-2">
+                             <h4 className="font-semibold text-readable">{oil.name}</h4>
+                             <span className="text-sm text-readable-muted">${oil.price_per_ml}/ml</span>
+                           </div>
+                           <p className="text-sm text-readable-secondary mb-3">
+                             {oil.benefits.join(', ')}
+                           </p>
                           <Button
                             variant="outline"
                             size="sm"
@@ -444,7 +444,7 @@ const BuildOil = () => {
                 {/* Step 1: Add Boost Ingredients */}
                 {currentStep === 1 && (
                   <div className="space-y-6">
-                    <p className="text-gray-600">Optional: Add premium ingredients to enhance your blend.</p>
+                    <p className="text-readable-muted">Optional: Add premium ingredients to enhance your blend.</p>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {boostOptions
@@ -459,14 +459,14 @@ const BuildOil = () => {
                             />
                             <div className="flex-1">
                               <div className="flex justify-between items-start">
-                                <Label htmlFor={boost.name} className="font-semibold text-gray-900">
-                                  {boost.name}
-                                </Label>
-                                <span className="text-sm text-gray-500">+${boost.price}</span>
-                              </div>
-                              <p className="text-sm text-gray-600 mt-1">
-                                {boost.benefits.join(', ')}
-                              </p>
+                                 <Label htmlFor={boost.name} className="font-semibold text-readable">
+                                   {boost.name}
+                                 </Label>
+                                 <span className="text-sm text-readable-muted">+${boost.price}</span>
+                               </div>
+                               <p className="text-sm text-readable-secondary mt-1">
+                                 {boost.benefits.join(', ')}
+                               </p>
                             </div>
                           </div>
                         </div>
@@ -478,7 +478,7 @@ const BuildOil = () => {
                 {/* Step 2: Choose Scent */}
                 {currentStep === 2 && (
                   <div className="space-y-6">
-                    <p className="text-gray-600">Optional: Add a natural scent to your oil blend.</p>
+                    <p className="text-readable-muted">Optional: Add a natural scent to your oil blend.</p>
                     
                     <RadioGroup value={scent} onValueChange={setScent} className="space-y-3">
                       {scentOptions.map((option) => (
@@ -509,7 +509,7 @@ const BuildOil = () => {
                 {/* Step 3: Name Your Blend */}
                 {currentStep === 3 && (
                   <div className="space-y-6">
-                    <p className="text-gray-600">Give your custom blend a unique name.</p>
+                    <p className="text-readable-muted">Give your custom blend a unique name.</p>
                     
                     <div>
                       <Label htmlFor="blend-name" className="text-sm font-medium">
@@ -529,7 +529,7 @@ const BuildOil = () => {
                 {/* Step 4: Choose Bottle Size */}
                 {currentStep === 4 && (
                   <div className="space-y-6">
-                    <p className="text-gray-600">Select your preferred bottle size.</p>
+                    <p className="text-readable-muted">Select your preferred bottle size.</p>
                     
                     <RadioGroup value={bottleSize} onValueChange={setBottleSize} className="space-y-3">
                       {bottleSizes.map((bottle) => (
@@ -538,7 +538,7 @@ const BuildOil = () => {
                             <RadioGroupItem value={bottle.size} id={bottle.size} />
                             <Label htmlFor={bottle.size} className="text-sm font-medium">{bottle.size}</Label>
                           </div>
-                          <span className="text-sm text-gray-600">${bottle.price}</span>
+                          <span className="text-sm text-readable-muted">${bottle.price}</span>
                         </div>
                       ))}
                     </RadioGroup>
@@ -552,47 +552,47 @@ const BuildOil = () => {
                     
                     <div className="bg-sage-light/20 rounded-lg p-6 space-y-4">
                       <div>
-                        <h4 className="font-semibold text-gray-900">{blendName}</h4>
-                        <p className="text-sm text-gray-600">{bottleSize} bottle</p>
-                      </div>
+                         <h4 className="font-semibold text-readable">{blendName}</h4>
+                         <p className="text-sm text-readable-muted">{bottleSize} bottle</p>
+                       </div>
 
-                      <div>
-                        <h5 className="font-medium text-gray-900 mb-2">Base Oils:</h5>
-                        {selectedBaseOils.map((oil, index) => (
-                          <div key={index} className="text-sm text-gray-600">
-                            {oil.name}: {oil.percentage}%
-                          </div>
-                        ))}
-                      </div>
+                       <div>
+                         <h5 className="font-medium text-readable mb-2">Base Oils:</h5>
+                         {selectedBaseOils.map((oil, index) => (
+                           <div key={index} className="text-sm text-readable-secondary">
+                             {oil.name}: {oil.percentage}%
+                           </div>
+                         ))}
+                       </div>
 
-                      {boostIngredients.length > 0 && (
-                        <div>
-                          <h5 className="font-medium text-gray-900 mb-2">Boost Ingredients:</h5>
-                          <div className="text-sm text-gray-600">
-                            {boostIngredients.join(', ')}
-                          </div>
-                        </div>
-                      )}
+                       {boostIngredients.length > 0 && (
+                         <div>
+                           <h5 className="font-medium text-readable mb-2">Boost Ingredients:</h5>
+                           <div className="text-sm text-readable-secondary">
+                             {boostIngredients.join(', ')}
+                           </div>
+                         </div>
+                       )}
 
-                      {scent && scent !== 'Unscented' && (
-                        <div>
-                          <h5 className="font-medium text-gray-900 mb-2">Scent:</h5>
-                          <div className="text-sm text-gray-600">
-                            {scent === 'Custom scent' ? customScent : scent}
-                          </div>
-                        </div>
-                      )}
+                       {scent && scent !== 'Unscented' && (
+                         <div>
+                           <h5 className="font-medium text-readable mb-2">Scent:</h5>
+                           <div className="text-sm text-readable-secondary">
+                             {scent === 'Custom scent' ? customScent : scent}
+                           </div>
+                         </div>
+                       )}
 
-                      <div>
-                        <h5 className="font-medium text-gray-900 mb-2">Benefits:</h5>
-                        <div className="text-sm text-gray-600">
-                          {generateBenefits().join(', ')}
-                        </div>
-                      </div>
+                       <div>
+                         <h5 className="font-medium text-readable mb-2">Benefits:</h5>
+                         <div className="text-sm text-readable-secondary">
+                           {generateBenefits().join(', ')}
+                         </div>
+                       </div>
 
-                      <div className="border-t border-gray-200 pt-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-lg font-semibold text-gray-900">Total Price:</span>
+                       <div className="border-t border-border pt-4">
+                         <div className="flex justify-between items-center">
+                           <span className="text-lg font-semibold text-readable">Total Price:</span>
                           <span className="text-2xl font-bold text-primary">${totalPrice}</span>
                         </div>
                       </div>
@@ -644,45 +644,45 @@ const BuildOil = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Blend Name:</h4>
-                  <p className="text-sm text-gray-600">{blendName || 'Not named yet'}</p>
-                </div>
+                   <h4 className="font-medium text-readable mb-2">Blend Name:</h4>
+                   <p className="text-sm text-readable-muted">{blendName || 'Not named yet'}</p>
+                 </div>
 
-                {selectedBaseOils.length > 0 && (
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Base Oils:</h4>
-                    {selectedBaseOils.map((oil, index) => (
-                      <div key={index} className="text-sm text-gray-600">
-                        {oil.name}: {oil.percentage}%
-                      </div>
-                    ))}
-                  </div>
-                )}
+                 {selectedBaseOils.length > 0 && (
+                   <div>
+                     <h4 className="font-medium text-readable mb-2">Base Oils:</h4>
+                     {selectedBaseOils.map((oil, index) => (
+                       <div key={index} className="text-sm text-readable-secondary">
+                         {oil.name}: {oil.percentage}%
+                       </div>
+                     ))}
+                   </div>
+                 )}
 
-                {boostIngredients.length > 0 && (
-                  <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Boosts:</h4>
-                    <div className="text-sm text-gray-600">
-                      {boostIngredients.join(', ')}
-                    </div>
-                  </div>
-                )}
+                 {boostIngredients.length > 0 && (
+                   <div>
+                     <h4 className="font-medium text-readable mb-2">Boosts:</h4>
+                     <div className="text-sm text-readable-secondary">
+                       {boostIngredients.join(', ')}
+                     </div>
+                   </div>
+                 )}
 
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Bottle Size:</h4>
-                  <p className="text-sm text-gray-600">{bottleSize}</p>
-                </div>
+                 <div>
+                   <h4 className="font-medium text-readable mb-2">Bottle Size:</h4>
+                   <p className="text-sm text-readable-muted">{bottleSize}</p>
+                 </div>
 
-                <div className="border-t border-gray-200 pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium text-gray-900">Total:</span>
+                 <div className="border-t border-border pt-4">
+                   <div className="flex justify-between items-center">
+                     <span className="font-medium text-readable">Total:</span>
                     <span className="text-xl font-bold text-primary">${totalPrice}</span>
                   </div>
                 </div>
 
                 {generateBenefits().length > 0 && (
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Benefits:</h4>
+                    <h4 className="font-medium text-readable mb-2">Benefits:</h4>
                     <div className="flex flex-wrap gap-1">
                       {generateBenefits().slice(0, 5).map((benefit, index) => (
                         <span key={index} className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">

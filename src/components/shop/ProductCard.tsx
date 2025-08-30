@@ -130,7 +130,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                         className={`h-4 w-4 ${
                           i < Math.floor(product.rating!) 
                             ? 'text-yellow-400 fill-current' 
-                            : 'text-gray-300'
+                             : 'text-muted-foreground'
                         }`}
                       />
                     ))}
@@ -242,7 +242,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
                           className={`h-4 w-4 ${
                             i < Math.floor(product.rating!) 
                               ? 'text-yellow-400 fill-current' 
-                              : 'text-gray-300'
+                              : 'text-muted-foreground'
                           }`}
                         />
                       ))}

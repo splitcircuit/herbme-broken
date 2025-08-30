@@ -343,8 +343,8 @@ const Quiz = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg text-primary-dark">{item.step}</h3>
-                      <h4 className="font-medium text-gray-900 mt-1">{item.product.name}</h4>
-                      <p className="text-gray-600 mt-2">{item.product.description}</p>
+                       <h4 className="font-medium text-readable mt-1">{item.product.name}</h4>
+                       <p className="text-readable-muted mt-2">{item.product.description}</p>
                       <p className="text-primary font-semibold mt-2">${item.product.price}</p>
                     </div>
                   </div>
@@ -352,9 +352,9 @@ const Quiz = () => {
               ))}
               
               <div className="text-center pt-6">
-                <p className="text-gray-600 mb-4">
-                  We've sent your personalized routine to {quizData.email}
-                </p>
+                 <p className="text-readable-muted mb-4">
+                   We've sent your personalized routine to {quizData.email}
+                 </p>
                 <Button size="lg" className="bg-gradient-primary text-white">
                   Shop Your Routine
                 </Button>
@@ -374,11 +374,11 @@ const Quiz = () => {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-heading text-primary-dark">Skin Analysis Quiz</h1>
-            <span className="text-sm text-gray-500">
-              {currentStep + 1} of {questions.length}
-            </span>
+             <span className="text-sm text-readable-muted">
+               {currentStep + 1} of {questions.length}
+             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
+          <div className="w-full bg-muted rounded-full h-2">
             <div 
               className="bg-gradient-primary h-2 rounded-full transition-all duration-300"
               style={{ width: `${((currentStep + 1) / questions.length) * 100}%` }}

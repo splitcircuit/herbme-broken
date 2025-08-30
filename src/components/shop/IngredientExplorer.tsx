@@ -23,7 +23,7 @@ export const IngredientExplorer = ({ ingredients, title = "Key Ingredients" }: I
       case 'active':
         return 'bg-orange-100 text-orange-800 hover:bg-orange-200';
       case 'base':
-        return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
+        return 'bg-muted text-foreground hover:bg-muted/80';
       default:
         return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
     }
