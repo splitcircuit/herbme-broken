@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, Droplets, Plus, Minus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useCart } from "@/contexts/CartContext";
 
 interface BaseOil {
   name: string;
@@ -41,6 +42,8 @@ const BuildOil = () => {
   const [allergens, setAllergens] = useState<string[]>([]);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const baseOilOptions = [
     { 
@@ -261,6 +264,26 @@ const BuildOil = () => {
     });
 
     return Array.from(benefits);
+  };
+
+  const addToCartHandler = () => {
+    // Create custom blend cart item
+    const customBlendItem = {
+      id: `custom-blend-${Date.now()}`, // Unique ID for custom blend
+      name: blendName || 'Custom Oil Blend',
+      price: totalPrice,
+      type: 'custom_blend' as const
+    };
+
+    addToCart(customBlendItem);
+    
+    toast({
+      title: "Added to Cart!",
+      description: `${customBlendItem.name} has been added to your cart.`
+    });
+    
+    // Navigate to cart
+    navigate('/cart');
   };
 
   const saveBlend = async () => {
@@ -602,10 +625,11 @@ const BuildOil = () => {
                       <Button onClick={saveBlend} variant="outline" className="flex-1">
                         Save My Blend
                       </Button>
-                      <Button asChild className="flex-1 bg-gradient-to-r from-primary to-success text-primary-foreground hover:opacity-90 transition-opacity">
-                        <Link to="/cart">
-                          Add to Cart
-                        </Link>
+                      <Button 
+                        onClick={addToCartHandler}
+                        className="flex-1 bg-gradient-to-r from-primary to-success text-primary-foreground hover:opacity-90 transition-opacity"
+                      >
+                        Add to Cart
                       </Button>
                     </div>
                   </div>

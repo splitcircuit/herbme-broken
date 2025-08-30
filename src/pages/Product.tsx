@@ -6,9 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Star, Leaf, Droplets, Sun } from "lucide-react";
 import { useParams, Link } from "react-router-dom";
 import { useEffect } from "react";
-import product1 from "@/assets/product-1.jpg";
-import product2 from "@/assets/product-2.jpg";
-import product3 from "@/assets/product-3.jpg";
+import { getProductById } from "@/data/products";
 
 // Shopify Buy Button type declarations
 declare global {
@@ -143,59 +141,7 @@ const Product = () => {
     };
   }, [id]);
   
-  // Mock product data - in a real app, this would come from an API
-  const productData: { [key: string]: any } = {
-    "1": {
-      name: "Watermelon Bombshell",
-      price: "$28",
-      image: product1,
-      tag: "Sunkissed Collection",
-      shortDescription: "Luxuriously lightweight yet deeply hydrating body oil",
-      longDescription: "Our Watermelon Bombshell body oil is luxuriously lightweight yet deeply hydrating, giving your skin a glowing, moisturized feel that lasts all day. Perfect for those sunny summer days when you want to shine without feeling greasy. Part of our Sunkissed Collection designed to bring ultimate summer vibes.",
-      ingredients: ["Watermelon Seed Oil", "Jojoba Oil", "Sweet Almond Oil", "Vitamin E", "Natural Fragrance"],
-      howToUse: "Apply to clean, dry skin. Massage gently until absorbed. Perfect for layering with our Foaming Body Scrub and Body Mist for the complete summer experience.",
-      skinTypes: ["All Skin Types", "Dry Skin", "Normal Skin", "Summer Care"],
-      benefits: ["Deep Hydration", "Glowing Skin", "Non-Greasy", "Long-Lasting Moisture"]
-    },
-    "2": {
-      name: "Body Juice",
-      price: "$26",
-      image: product2,
-      tag: "Sunkissed Collection",
-      shortDescription: "Hydrating body essence for glowing, moisturized skin",
-      longDescription: "Our Body Juice is a hydrating body essence that gives your skin a glowing, moisturized feel that lasts all day. This lightweight formula absorbs quickly while providing deep nourishment. Perfect for those sunny summer days when you want healthy, radiant skin. Part of our Sunkissed Collection designed to bring ultimate summer vibes.",
-      ingredients: ["Aloe Vera Extract", "Hyaluronic Acid", "Watermelon Extract", "Glycerin", "Natural Moisturizers"],
-      howToUse: "Apply to clean, damp skin. Massage gently until absorbed. Can be used alone or layered under Watermelon Bombshell body oil for extra hydration.",
-      skinTypes: ["All Skin Types", "Dehydrated Skin", "Normal Skin", "Combination Skin"],
-      benefits: ["Deep Hydration", "Glowing Skin", "Quick Absorption", "Lightweight Feel"]
-    },
-    "3": {
-      name: "Foaming Body Scrub",
-      price: "$32",
-      image: product3,
-      tag: "Sunkissed Collection",
-      shortDescription: "5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens",
-      longDescription: "Our Foaming Body Scrub is a 5-in-one shower essential that foams, exfoliates, cleanses, hydrates, and softens your skin all in one step. This convenient formula saves you money and shower space compared to buying separate soap and scrub products. Part of our Sunkissed Collection for ultimate summer vibes.",
-      ingredients: ["Watermelon Extract", "Sugar Crystals", "Coconut Oil", "Shea Butter", "Natural Foaming Agents", "Vitamin C"],
-      howToUse: "Apply to wet skin in circular motions. The formula will foam and exfoliate simultaneously. Rinse thoroughly. Follow with Body Juice or Watermelon Bombshell body oil for best results.",
-      skinTypes: ["All Skin Types", "Rough Skin", "Dull Skin", "Normal Skin"],
-      benefits: ["Exfoliates", "Cleanses", "Hydrates", "Softens", "Space-Saving"]
-    },
-    "4": {
-      name: "Body Mist",
-      price: "$24",
-      image: product1,
-      tag: "Sunkissed Collection",
-      shortDescription: "Juicy, sweet, and refreshing scent for long-lasting summer fragrance",
-      longDescription: "Our Body Mist features a juicy, sweet, and refreshing watermelon scent that captures the essence of summer. Perfect for layering with the Foaming Body Scrub, Body Juice, and Watermelon Bombshell body oil for a long-lasting summer fragrance experience. Part of our Sunkissed Collection designed to bring ultimate summer vibes.",
-      ingredients: ["Watermelon Fragrance", "Aloe Vera", "Rose Water", "Glycerin", "Natural Preservatives"],
-      howToUse: "Spray on pulse points and body as desired. Layer with our Body Juice and Watermelon Bombshell body oil, and use after our Foaming Body Scrub for the complete Sunkissed Collection experience.",
-      skinTypes: ["All Skin Types", "Sensitive Skin", "Normal Skin", "Fragrance Lovers"],
-      benefits: ["Refreshing Scent", "Long-Lasting", "Layerable", "Summer Vibes"]
-    }
-  };
-
-  const product = productData[id || "1"];
+  const product = getProductById(id || "");
 
   if (!product) {
     return (
@@ -249,12 +195,18 @@ const Product = () => {
                 {product.shortDescription}
               </p>
               <div className="flex items-center space-x-4 mb-6">
-                <span className="text-3xl font-bold text-brand-green">{product.price}</span>
+                <span className="text-3xl font-bold text-brand-green">${product.price}</span>
                 <div className="flex items-center space-x-1">
                   {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className={`h-5 w-5 ${
+                      product.rating && i < Math.floor(product.rating) 
+                        ? 'fill-yellow-400 text-yellow-400' 
+                        : 'text-muted-foreground'
+                    }`} />
                   ))}
-                  <span className="text-sm text-muted-foreground ml-2">(127 reviews)</span>
+                  <span className="text-sm text-muted-foreground ml-2">
+                    ({product.reviewCount || 0} reviews)
+                  </span>
                 </div>
               </div>
             </div>
@@ -264,8 +216,8 @@ const Product = () => {
               <h3 className="font-heading font-semibold mb-3">Perfect For:</h3>
               <div className="flex flex-wrap gap-2">
                 {product.skinTypes.map((type: string, index: number) => (
-                  <Badge key={index} variant="outline" className="border-herb-light-green text-herb-deep-green">
-                    {type}
+                  <Badge key={index} variant="outline" className="border-herb-light-green text-herb-deep-green capitalize">
+                    {type} skin
                   </Badge>
                 ))}
               </div>
@@ -315,7 +267,7 @@ const Product = () => {
                 <CardContent className="p-8">
                   <h3 className="text-xl font-heading font-semibold mb-4">Product Description</h3>
                   <p className="text-muted-foreground leading-relaxed">
-                    {product.longDescription}
+                    {product.description}
                   </p>
                 </CardContent>
               </Card>
@@ -326,10 +278,10 @@ const Product = () => {
                 <CardContent className="p-8">
                   <h3 className="text-xl font-heading font-semibold mb-4">Natural Ingredients</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {product.ingredients.map((ingredient: string, index: number) => (
+                    {product.ingredients.map((ingredient, index: number) => (
                       <div key={index} className="flex items-center space-x-3">
                         <Droplets className="h-4 w-4 text-herb-deep-green" />
-                        <span>{ingredient}</span>
+                        <span>{ingredient.name}</span>
                       </div>
                     ))}
                   </div>
@@ -366,30 +318,7 @@ const Product = () => {
             You Might Also Like
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {Object.entries(productData)
-              .filter(([key]) => key !== id)
-              .slice(0, 3)
-              .map(([key, relatedProduct]) => (
-                <Card key={key} className="group hover:shadow-card transition-smooth border-0 shadow-natural">
-                  <div className="relative overflow-hidden">
-                    <img 
-                      src={relatedProduct.image} 
-                      alt={relatedProduct.name}
-                      className="w-full h-64 object-cover group-hover:scale-105 transition-smooth"
-                    />
-                  </div>
-                  <CardContent className="p-6">
-                    <h3 className="font-heading font-semibold mb-2">{relatedProduct.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-4">{relatedProduct.shortDescription}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-lg font-bold text-brand-green">{relatedProduct.price}</span>
-                      <Button asChild size="sm">
-                        <Link to={`/product/${key}`}>View</Link>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+            {/* We can add related products logic here later */}
           </div>
         </div>
       </div>

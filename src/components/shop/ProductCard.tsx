@@ -178,7 +178,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
         </Link>
 
         {/* Quick Add to Cart - appears on hover */}
-        <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-2 group-hover:translate-y-0">
+        <div className="absolute bottom-20 left-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-y-2 group-hover:translate-y-0">
           <Button 
             onClick={handleAddToCart}
             className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
