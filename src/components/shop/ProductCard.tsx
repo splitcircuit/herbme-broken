@@ -9,6 +9,7 @@ import { Product } from '@/types/product';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
 import { useRecentlyViewed } from '@/contexts/RecentlyViewedContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface ProductCardProps {
   product: Product;
@@ -19,6 +20,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
   const { addToRecentlyViewed } = useRecentlyViewed();
+  const { toast } = useToast();
   
   const inWishlist = isInWishlist(product.id);
 
@@ -50,6 +52,11 @@ export const ProductCard = ({ product }: ProductCardProps) => {
       price: product.price,
       image: product.image,
       type: 'product'
+    });
+
+    toast({
+      title: "Added to Cart!",
+      description: `${product.name} has been added to your cart.`,
     });
   };
 

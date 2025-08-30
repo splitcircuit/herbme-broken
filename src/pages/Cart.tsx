@@ -7,10 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useLocationDetection } from "@/components/shop/LocationDetector";
 import { LocationConfirmationBar } from "@/components/shop/LocationConfirmationBar";
+import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
   const navigate = useNavigate();
   const { cartItems, addToCart, updateQuantity, removeItem, getCartTotal } = useCart();
+  const { toast } = useToast();
   const { 
     isTurksAndCaicos,
     country,
@@ -56,6 +58,11 @@ const Cart = () => {
       price: item.price,
       image: item.image,
       type: item.type
+    });
+
+    toast({
+      title: "Added to Cart!",
+      description: `${item.name} has been added to your cart.`,
     });
   };
 
