@@ -174,7 +174,7 @@ export const BankTransferModal = ({ isOpen, onClose, orderTotal, orderNumber }: 
                 <p className="font-medium">For E-Transfer (Interac):</p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
                   <li>Use the account name exactly as shown above</li>
-                  <li>Include your order number in the message field</li>
+                  <li>Include your phone number from the order form in the message field</li>
                   <li>No security question required</li>
                 </ul>
               </div>
@@ -185,7 +185,7 @@ export const BankTransferModal = ({ isOpen, onClose, orderTotal, orderNumber }: 
                 <p className="font-medium">For Wire Transfer:</p>
                 <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
                   <li>Include all bank details as provided</li>
-                  <li>Mention your order number in the reference field</li>
+                  <li>Use your phone number from the order form in the reference field</li>
                   <li>Allow 1-3 business days for processing</li>
                 </ul>
               </div>
@@ -194,10 +194,19 @@ export const BankTransferModal = ({ isOpen, onClose, orderTotal, orderNumber }: 
               
               <div className="p-3 bg-accent/20 rounded-lg">
                 <p className="font-medium text-accent-foreground">
+                  💡 Payment Reference: Use your phone number from the order form
+                </p>
+                <p className="text-sm text-muted-foreground mt-2">
+                  This helps us match your payment to your order quickly and accurately.
+                </p>
+              </div>
+              
+              <div className="p-3 bg-accent/20 rounded-lg mt-3">
+                <p className="font-medium text-accent-foreground">
                   📧 After completing your transfer, please email us at orders@herbme.tc with:
                 </p>
                 <ul className="list-disc list-inside text-sm text-muted-foreground mt-2 ml-4">
-                  <li>Your order number: {orderNumber || 'Available after checkout'}</li>
+                  <li>Your phone number (same as used in transfer reference)</li>
                   <li>Transfer confirmation/receipt</li>
                   <li>Transfer date and amount</li>
                 </ul>

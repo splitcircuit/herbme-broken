@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -18,6 +18,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { PayPalProvider } from './PayPalProvider';
 import { PayPalButton } from './PayPalButton';
+import { BankTransferModal } from './BankTransferModal';
 
 const orderSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -30,7 +31,7 @@ const orderSchema = z.object({
   country: z.string().min(1, 'Country is required'),
   deliveryMethod: z.enum(['local_delivery', 'pickup', 'shipping']),
   deliveryNotes: z.string().optional(),
-  paymentPreference: z.enum(['pay_now', 'request_quote', 'cash_on_delivery']),
+  paymentPreference: z.enum(['pay_now', 'bank_transfer', 'cash_on_delivery']),
 });
 
 type OrderFormData = z.infer<typeof orderSchema>;
@@ -43,6 +44,7 @@ interface OrderRequestFormProps {
 export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentOrderNumber, setCurrentOrderNumber] = useState<string>('');
+  const [showBankTransferModal, setShowBankTransferModal] = useState(false);
   const { cartItems, getCartTotal, clearCart } = useCart();
   const { isTurksAndCaicos, country } = useLocationDetection();
   const { toast } = useToast();
@@ -54,26 +56,32 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
     defaultValues: {
       country: country || (isTurksAndCaicos ? 'Turks and Caicos' : ''),
       deliveryMethod: isTurksAndCaicos ? 'local_delivery' : 'shipping',
-      paymentPreference: isTurksAndCaicos ? 'cash_on_delivery' : 'request_quote',
+      paymentPreference: isTurksAndCaicos ? 'cash_on_delivery' : 'bank_transfer',
     }
   });
 
   const selectedDeliveryMethod = form.watch('deliveryMethod');
   const selectedPaymentPreference = form.watch('paymentPreference');
 
-  const onSubmit = async (data: OrderFormData) => {
-    if (cartItems.length === 0) {
-      toast({
-        title: "Empty Cart",
-        description: "Please add items to your cart before placing an order.",
-        variant: "destructive"
-      });
-      return;
+  // Show bank transfer modal when selected
+  useEffect(() => {
+    if (selectedPaymentPreference === 'bank_transfer') {
+      setShowBankTransferModal(true);
     }
+  }, [selectedPaymentPreference]);
 
-    setIsSubmitting(true);
-
+  const onSubmit = async (data: OrderFormData) => {
     try {
+      if (cartItems.length === 0) {
+        toast({
+          title: "Empty Cart",
+          description: "Please add items to your cart before placing an order.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setIsSubmitting(true);
       // Prepare order data
       const orderData = {
         email: data.email,
@@ -140,9 +148,15 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
 
     } catch (error: any) {
       console.error('Order submission error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       toast({
         title: "Order Submission Failed",
-        description: error.message || "Please try again or contact support.",
+        description: error.message || "Please check your information and try again.",
         variant: "destructive"
       });
     } finally {
@@ -165,7 +179,7 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
 
   const getPaymentOptions = () => {
     const baseOptions = [
-      { value: 'request_quote', label: 'Request Quote First' }
+      { value: 'bank_transfer', label: 'Bank Transfer' }
     ];
 
     if (isTurksAndCaicos) {
@@ -436,7 +450,7 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
                     disabled={isSubmitting || cartItems.length === 0}
                   >
                     {isSubmitting ? 'Submitting...' : 
-                     selectedPaymentPreference === 'request_quote' ? 'Submit Order Request' : 
+                     selectedPaymentPreference === 'bank_transfer' ? 'Submit Order (Bank Transfer)' : 
                      'Submit Order Request'}
                   </Button>
                 ) : (
@@ -520,7 +534,7 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
                     <p className="text-sm text-muted-foreground">
                       {selectedPaymentPreference === 'pay_now' && 'You will be redirected to secure payment processing.'}
                       {selectedPaymentPreference === 'cash_on_delivery' && 'Pay with cash when your order is delivered.'}
-                      {selectedPaymentPreference === 'request_quote' && 'We will send you a detailed quote with payment options.'}
+                      {selectedPaymentPreference === 'bank_transfer' && 'We will provide bank transfer details after order submission.'}
                     </p>
                   </div>
                 )}
@@ -529,6 +543,14 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
           </div>
         </div>
       </DialogContent>
+      
+      {/* Bank Transfer Modal */}
+      <BankTransferModal
+        isOpen={showBankTransferModal}
+        onClose={() => setShowBankTransferModal(false)}
+        orderTotal={total.total}
+        orderNumber={currentOrderNumber || undefined}
+      />
     </Dialog>
   );
 };

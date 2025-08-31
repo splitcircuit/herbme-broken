@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, MapPin, CreditCard, Package } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PayPalProvider } from "@/components/shop/PayPalProvider";
 import { PayPalButton } from "@/components/shop/PayPalButton";
+import { BankTransferModal } from "@/components/shop/BankTransferModal";
 
 const orderSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -47,6 +48,7 @@ const Checkout = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentOrderNumber, setCurrentOrderNumber] = useState<string>('');
+  const [showBankTransferModal, setShowBankTransferModal] = useState(false);
 
   const { subtotal, shipping, tax, total } = getCartTotal();
 
@@ -61,6 +63,13 @@ const Checkout = () => {
 
   const selectedPaymentPreference = form.watch('paymentPreference');
 
+  // Show bank transfer modal when selected
+  useEffect(() => {
+    if (selectedPaymentPreference === 'bank_transfer') {
+      setShowBankTransferModal(true);
+    }
+  }, [selectedPaymentPreference]);
+
   // Redirect to cart if empty
   if (cartItems.length === 0) {
     navigate('/cart');
@@ -68,18 +77,17 @@ const Checkout = () => {
   }
 
   const onSubmit = async (data: OrderFormData) => {
-    if (cartItems.length === 0) {
-      toast({
-        title: "Empty Cart",
-        description: "Please add items to your cart before placing an order.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-
     try {
+      if (cartItems.length === 0) {
+        toast({
+          title: "Empty Cart",
+          description: "Please add items to your cart before placing an order.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setIsSubmitting(true);
       // Prepare order data
       const orderData = {
         email: data.email,
@@ -140,9 +148,15 @@ const Checkout = () => {
 
     } catch (error: any) {
       console.error('Order submission error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
       toast({
         title: "Order Submission Failed",
-        description: error.message || "Please try again or contact support.",
+        description: error.message || "Please check your information and try again.",
         variant: "destructive"
       });
     } finally {
@@ -605,6 +619,14 @@ const Checkout = () => {
           </div>
         </div>
       </div>
+      
+      {/* Bank Transfer Modal */}
+      <BankTransferModal
+        isOpen={showBankTransferModal}
+        onClose={() => setShowBankTransferModal(false)}
+        orderTotal={total}
+        orderNumber={currentOrderNumber || undefined}
+      />
     </div>
   );
 };
