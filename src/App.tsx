@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navigation from "@/components/ui/navigation";
 import Footer from "@/components/ui/footer";
+import ScrollToTop from "@/components/ScrollToTop";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { CartProvider } from "@/contexts/CartContext";
@@ -35,6 +36,7 @@ const App = () => (
         <TooltipProvider>
           <PayPalProvider>
             <BrowserRouter>
+              <ScrollToTop />
               <AuthProvider>
                 <LocationProvider>
                   <CartProvider>
