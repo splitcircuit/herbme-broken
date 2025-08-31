@@ -17,6 +17,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useLocationDetection } from "@/components/shop/LocationDetector";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { PayPalProvider } from "@/components/shop/PayPalProvider";
+import { PayPalButton } from "@/components/shop/PayPalButton";
 
 const orderSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -44,6 +46,7 @@ const Checkout = () => {
   } = useLocationDetection();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentOrderNumber, setCurrentOrderNumber] = useState<string>('');
 
   const { subtotal, shipping, tax, total } = getCartTotal();
 
@@ -124,16 +127,16 @@ const Checkout = () => {
         throw error;
       }
 
-      // Clear cart and navigate to confirmation
-      clearCart();
-      
-      navigate(`/order-confirmation/${order.order_number}`);
+      // Store order number for PayPal integration
+      setCurrentOrderNumber(order.order_number);
 
-      // If paying now, redirect to payment (would need Stripe integration)
-      if (data.paymentPreference === 'pay_now') {
-        // TODO: Integrate with Stripe for immediate payment
-        // Redirect to payment would happen here
+      // For non-PayPal payments, clear cart and navigate to confirmation
+      if (data.paymentPreference !== 'pay_now') {
+        clearCart();
+        navigate(`/order-confirmation/${order.order_number}`);
       }
+      
+      // For PayPal payments, keep cart until payment is completed
 
     } catch (error: any) {
       console.error('Order submission error:', error);
@@ -167,20 +170,37 @@ const Checkout = () => {
     if (isTurksAndCaicos) {
       baseOptions.unshift(
         { value: 'cash_on_delivery', label: 'Cash on Delivery' },
-        { value: 'pay_now', label: 'Pay Online Now' }
+        { value: 'pay_now', label: 'Pay with PayPal' }
       );
     } else {
       baseOptions.push(
-        { value: 'pay_now', label: 'Pay Online Now' }
+        { value: 'pay_now', label: 'Pay with PayPal' }
       );
     }
 
     return baseOptions;
   };
 
-  const handlePayNow = () => {
-    // TODO: Integrate Stripe for immediate payment
-    // Redirect to Stripe payment would happen here
+  const handlePayPalSuccess = (paypalOrderId: string, captureId: string) => {
+    clearCart();
+    toast({
+      title: "Payment Successful!",
+      description: "Your order has been completed. Redirecting to confirmation...",
+    });
+    
+    // Small delay to show success message before redirect
+    setTimeout(() => {
+      navigate(`/order-confirmation/${currentOrderNumber}`);
+    }, 1500);
+  };
+
+  const handlePayPalError = (error: any) => {
+    console.error('PayPal payment failed:', error);
+    toast({
+      title: "Payment Failed",
+      description: "PayPal payment failed. Please try again or use a different payment method.",
+      variant: "destructive"
+    });
   };
 
   return (
@@ -424,32 +444,73 @@ const Checkout = () => {
                           )}
                         />
 
-                        {/* Bank Transfer Notice */}
-                        {selectedPaymentPreference === 'bank_transfer' && (
-                          <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                            <div className="space-y-2">
-                              <h4 className="font-medium text-sm flex items-center gap-2">
-                                <CreditCard className="h-4 w-4" />
-                                Bank Transfer Selected
-                              </h4>
-                              <p className="text-sm text-muted-foreground">
-                                After submitting your order, you'll receive complete bank transfer details with your order number for payment reference.
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+                         {/* Bank Transfer Notice */}
+                         {selectedPaymentPreference === 'bank_transfer' && (
+                           <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                             <div className="space-y-2">
+                               <h4 className="font-medium text-sm flex items-center gap-2">
+                                 <CreditCard className="h-4 w-4" />
+                                 Bank Transfer Selected
+                               </h4>
+                               <p className="text-sm text-muted-foreground">
+                                 After submitting your order, you'll receive complete bank transfer details with your order number for payment reference.
+                               </p>
+                             </div>
+                           </div>
+                         )}
 
-                      <Button 
-                        type="submit" 
-                        className="w-full"
-                        disabled={isSubmitting || cartItems.length === 0}
-                      >
-                        {isSubmitting ? 'Submitting...' : 
-                         selectedPaymentPreference === 'pay_now' ? 'Submit Order & Pay' : 
-                         selectedPaymentPreference === 'bank_transfer' ? 'Submit Order (Bank Transfer)' :
-                         'Submit Order Request'}
-                      </Button>
+                         {/* PayPal Notice */}
+                         {selectedPaymentPreference === 'pay_now' && (
+                           <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                             <div className="space-y-2">
+                               <h4 className="font-medium text-sm flex items-center gap-2">
+                                 <CreditCard className="h-4 w-4" />
+                                 PayPal Payment Selected
+                               </h4>
+                               <p className="text-sm text-muted-foreground">
+                                 After submitting your order details, you'll be able to complete payment using PayPal.
+                               </p>
+                             </div>
+                           </div>
+                         )}
+                       </div>
+
+                       {/* Regular form submission for non-PayPal payments */}
+                       {selectedPaymentPreference !== 'pay_now' ? (
+                         <Button 
+                           type="submit" 
+                           className="w-full"
+                           disabled={isSubmitting || cartItems.length === 0}
+                         >
+                           {isSubmitting ? 'Submitting...' : 
+                            selectedPaymentPreference === 'bank_transfer' ? 'Submit Order (Bank Transfer)' :
+                            'Submit Order Request'}
+                         </Button>
+                       ) : (
+                         <div className="space-y-4">
+                           <Button 
+                             type="submit" 
+                             className="w-full"
+                             disabled={isSubmitting || cartItems.length === 0}
+                           >
+                             {isSubmitting ? 'Preparing PayPal Payment...' : 'Prepare Order for PayPal Payment'}
+                           </Button>
+                           
+                           {currentOrderNumber && (
+                             <PayPalProvider>
+                               <div className="border rounded-lg p-4">
+                                 <h4 className="font-medium mb-2">Complete Payment with PayPal</h4>
+                                 <PayPalButton
+                                   amount={total}
+                                   orderId={currentOrderNumber}
+                                   onSuccess={handlePayPalSuccess}
+                                   onError={handlePayPalError}
+                                 />
+                               </div>
+                             </PayPalProvider>
+                           )}
+                         </div>
+                       )}
                     </form>
                   </Form>
                 </CardContent>
@@ -468,22 +529,22 @@ const Checkout = () => {
                     </Badge>
                   </div>
                   
-                  <h3 className="font-medium text-sm text-muted-foreground mb-4">
-                    Secure online payment:
-                  </h3>
+                   <h3 className="font-medium text-sm text-muted-foreground mb-4">
+                     Secure PayPal payment:
+                   </h3>
+                   
+                   <PayPalProvider>
+                     <PayPalButton
+                       amount={total}
+                       orderId={`INTL-${Date.now()}`}
+                       onSuccess={handlePayPalSuccess}
+                       onError={handlePayPalError}
+                     />
+                   </PayPalProvider>
                   
-                  <Button 
-                    className="w-full justify-start" 
-                    size="lg"
-                    onClick={handlePayNow}
-                  >
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Pay Now
-                  </Button>
-                  
-                  <p className="text-xs text-muted-foreground text-center pt-2">
-                    International shipping • Secure online payment
-                  </p>
+                   <p className="text-xs text-muted-foreground text-center pt-2">
+                     International shipping • Secure PayPal payment
+                   </p>
                 </CardContent>
               </Card>
             )}

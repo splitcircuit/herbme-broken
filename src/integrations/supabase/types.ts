@@ -150,6 +150,10 @@ export type Database = {
           order_type: string
           payment_method: string | null
           payment_status: string
+          paypal_capture_id: string | null
+          paypal_order_id: string | null
+          paypal_payer_id: string | null
+          paypal_status: string | null
           phone: string | null
           shipped_at: string | null
           shipping_address: Json
@@ -184,6 +188,10 @@ export type Database = {
           order_type: string
           payment_method?: string | null
           payment_status?: string
+          paypal_capture_id?: string | null
+          paypal_order_id?: string | null
+          paypal_payer_id?: string | null
+          paypal_status?: string | null
           phone?: string | null
           shipped_at?: string | null
           shipping_address: Json
@@ -218,6 +226,10 @@ export type Database = {
           order_type?: string
           payment_method?: string | null
           payment_status?: string
+          paypal_capture_id?: string | null
+          paypal_order_id?: string | null
+          paypal_payer_id?: string | null
+          paypal_status?: string | null
           phone?: string | null
           shipped_at?: string | null
           shipping_address?: Json

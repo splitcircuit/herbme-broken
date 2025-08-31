@@ -16,6 +16,8 @@ import { useCart } from '@/contexts/CartContext';
 import { useLocationDetection } from './LocationDetector';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { PayPalProvider } from './PayPalProvider';
+import { PayPalButton } from './PayPalButton';
 
 const orderSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -40,6 +42,7 @@ interface OrderRequestFormProps {
 
 export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentOrderNumber, setCurrentOrderNumber] = useState<string>('');
   const { cartItems, getCartTotal, clearCart } = useCart();
   const { isTurksAndCaicos, country } = useLocationDetection();
   const { toast } = useToast();
@@ -118,21 +121,22 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
         throw error;
       }
 
-      // Clear cart and show success
-      clearCart();
-      
-      toast({
-        title: "Order Submitted Successfully!",
-        description: `Order #${order.order_number} has been submitted. We'll contact you soon with next steps.`
-      });
+      // Store order number for PayPal integration
+      setCurrentOrderNumber(order.order_number);
 
-      onClose();
+      // For non-PayPal payments, clear cart and show success
+      if (data.paymentPreference !== 'pay_now') {
+        clearCart();
+        
+        toast({
+          title: "Order Submitted Successfully!",
+          description: `Order #${order.order_number} has been submitted. We'll contact you soon with next steps.`
+        });
 
-      // If paying now, redirect to payment (would need Stripe integration)
-      if (data.paymentPreference === 'pay_now') {
-        // TODO: Integrate with Stripe for immediate payment
-        // Redirect to payment would happen here
+        onClose();
       }
+      
+      // For PayPal payments, keep cart until payment is completed
 
     } catch (error: any) {
       console.error('Order submission error:', error);
@@ -167,15 +171,34 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
     if (isTurksAndCaicos) {
       baseOptions.unshift(
         { value: 'cash_on_delivery', label: 'Cash on Delivery' },
-        { value: 'pay_now', label: 'Pay Online Now' }
+        { value: 'pay_now', label: 'Pay with PayPal' }
       );
     } else {
       baseOptions.push(
-        { value: 'pay_now', label: 'Pay Online Now' }
+        { value: 'pay_now', label: 'Pay with PayPal' }
       );
     }
 
     return baseOptions;
+  };
+
+  const handlePayPalSuccess = (paypalOrderId: string, captureId: string) => {
+    clearCart();
+    toast({
+      title: "Payment Successful!",
+      description: "Your order has been completed successfully!",
+    });
+    
+    onClose();
+  };
+
+  const handlePayPalError = (error: any) => {
+    console.error('PayPal payment failed:', error);
+    toast({
+      title: "Payment Failed",
+      description: "PayPal payment failed. Please try again or use a different payment method.",
+      variant: "destructive"
+    });
   };
 
   return (
@@ -405,15 +428,42 @@ export const OrderRequestForm = ({ isOpen, onClose }: OrderRequestFormProps) => 
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full"
-                  disabled={isSubmitting || cartItems.length === 0}
-                >
-                  {isSubmitting ? 'Submitting...' : 
-                   selectedPaymentPreference === 'pay_now' ? 'Submit Order & Pay' : 
-                   'Submit Order Request'}
-                </Button>
+                {/* Regular form submission for non-PayPal payments */}
+                {selectedPaymentPreference !== 'pay_now' ? (
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isSubmitting || cartItems.length === 0}
+                  >
+                    {isSubmitting ? 'Submitting...' : 
+                     selectedPaymentPreference === 'request_quote' ? 'Submit Order Request' : 
+                     'Submit Order Request'}
+                  </Button>
+                ) : (
+                  <div className="space-y-4">
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={isSubmitting || cartItems.length === 0}
+                    >
+                      {isSubmitting ? 'Preparing PayPal Payment...' : 'Prepare Order for PayPal Payment'}
+                    </Button>
+                    
+                    {currentOrderNumber && (
+                      <PayPalProvider>
+                        <div className="border rounded-lg p-4">
+                          <h4 className="font-medium mb-2">Complete Payment with PayPal</h4>
+                          <PayPalButton
+                            amount={total.total}
+                            orderId={currentOrderNumber}
+                            onSuccess={handlePayPalSuccess}
+                            onError={handlePayPalError}
+                          />
+                        </div>
+                      </PayPalProvider>
+                    )}
+                  </div>
+                )}
               </form>
             </Form>
           </div>
