@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -275,8 +276,8 @@ const Shop = () => {
             Not sure which products are right for your skin? Get in touch and we'll help you create 
             the perfect natural skincare routine.
           </p>
-          <Button size="lg" variant="outline">
-            Get Skincare Advice
+          <Button size="lg" variant="outline" asChild>
+            <Link to="/contact">Get Skincare Advice</Link>
           </Button>
         </div>
       </div>
