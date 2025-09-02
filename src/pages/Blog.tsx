@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { NewsletterSignup } from "@/components/ui/newsletter-signup";
 import product1 from "@/assets/product-1.jpg";
 import product2 from "@/assets/product-2.jpg";
 import product3 from "@/assets/product-3.jpg";
@@ -200,15 +201,13 @@ const Blog = () => {
             Subscribe to our newsletter for the latest skincare tips, ingredient spotlights, 
             and exclusive content about natural beauty and island wellness.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto mb-6">
-            <input 
-              type="email" 
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 rounded-lg border border-border bg-background"
+          <div className="max-w-md mx-auto mb-6">
+            <NewsletterSignup 
+              placeholder="Enter your email" 
+              buttonText="Subscribe"
+              source="Blog - Stay Updated"
+              tags={['herbme', 'website', 'blog']}
             />
-            <Button size="lg" className="bg-success hover:bg-success/90 text-success-foreground">
-              Subscribe
-            </Button>
           </div>
           <p className="text-xs text-muted-foreground">
             We respect your privacy. Unsubscribe at any time.

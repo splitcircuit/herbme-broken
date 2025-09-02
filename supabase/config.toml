@@ -1,1 +1,4 @@
 project_id = "hwhxguflmceujvrhnkjd"
+
+[functions.brevo-sync]
+verify_jwt = false

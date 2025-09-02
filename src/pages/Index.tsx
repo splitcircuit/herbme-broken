@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { Star, Leaf, Heart, Award } from "lucide-react";
 import { Link } from "react-router-dom";
+import { NewsletterSignup } from "@/components/ui/newsletter-signup";
 import heroImage from "@/assets/hero-skincare.jpg";
 import product1 from "@/assets/product-1.jpg";
 import product2 from "@/assets/product-2.jpg";
@@ -230,15 +230,13 @@ const Index = () => {
           <p className="text-lg text-muted-foreground mb-8">
             Get exclusive access to new products, skincare tips, and island-inspired wellness content
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <Input 
-              type="email" 
-              placeholder="Enter your email"
-              className="flex-1"
+          <div className="max-w-md mx-auto">
+            <NewsletterSignup 
+              placeholder="Enter your email" 
+              buttonText="Join the Family"
+              source="Homepage - Join HerbMe Family"
+              tags={['herbme', 'website', 'homepage']}
             />
-            <Button size="lg" className="bg-success hover:bg-success/90 text-success-foreground">
-              Subscribe
-            </Button>
           </div>
         </div>
       </section>
