@@ -28,6 +28,11 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import NotFound from "./pages/NotFound";
+import Scan from "./pages/Scan";
+import ScanResult from "./pages/ScanResult";
+import ScanHistory from "./pages/ScanHistory";
+import Ingredients from "./pages/Ingredients";
+import IngredientDetail from "./pages/IngredientDetail";
 
 const App = () => (
   <ErrorBoundary>
@@ -58,6 +63,11 @@ const App = () => (
                               <Route path="/blog" element={<Blog />} />
                               <Route path="/contact" element={<Contact />} />
                               <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmation />} />
+                              <Route path="/scan" element={<Scan />} />
+                              <Route path="/scan/result/:scanId" element={<ScanResult />} />
+                              <Route path="/scan-history" element={<ScanHistory />} />
+                              <Route path="/ingredients" element={<Ingredients />} />
+                              <Route path="/ingredients/:slug" element={<IngredientDetail />} />
                               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                               <Route path="*" element={<NotFound />} />
                             </Routes>
