@@ -9,10 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ClipboardPaste, Search, Barcode, Sparkles, AlertTriangle, History } from "lucide-react";
+import { Loader2, ClipboardPaste, Search, Barcode, Sparkles, Beaker, History } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const SAMPLE_INGREDIENTS = `Water, Glycerin, Sodium Lauryl Sulfate, Fragrance, Methylparaben, Propylene Glycol, Dimethicone, Limonene, Linalool, Alcohol Denat`;
+import { SampleScanModal, SampleItem } from "@/components/scan/SampleScanModal";
 
 export default function Scan() {
   const navigate = useNavigate();
@@ -24,6 +23,7 @@ export default function Scan() {
   const [barcode, setBarcode] = useState("");
   const [productSearch, setProductSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sampleModalOpen, setSampleModalOpen] = useState(false);
 
   const handleAnalyze = async () => {
     let inputType: "paste" | "product" | "barcode" = "paste";
@@ -44,7 +44,6 @@ export default function Scan() {
       inputType = "barcode";
       payload = { barcode: barcode.trim() };
     } else if (activeTab === "product") {
-      // For MVP, treat product search as paste if text entered
       if (!productSearch.trim()) {
         toast({ title: "Please enter a product name or ingredients", variant: "destructive" });
         return;
@@ -66,7 +65,6 @@ export default function Scan() {
 
       if (error) throw error;
 
-      // Store in localStorage for guest history
       const history = JSON.parse(localStorage.getItem("scanHistory") || "[]");
       history.unshift({ scanId: data.scanId, createdAt: new Date().toISOString() });
       localStorage.setItem("scanHistory", JSON.stringify(history.slice(0, 5)));
@@ -90,9 +88,13 @@ export default function Scan() {
     setProductSearch("");
   };
 
-  const loadSample = () => {
-    setIngredientsText(SAMPLE_INGREDIENTS);
+  const handleSelectSample = (sample: SampleItem) => {
+    setIngredientsText(sample.ingredients);
     setActiveTab("paste");
+    toast({
+      title: "Sample loaded",
+      description: `"${sample.name}" ingredients ready to analyze`,
+    });
   };
 
   return (
@@ -102,10 +104,10 @@ export default function Scan() {
         <div className="max-w-2xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full mb-4">
             <Sparkles className="w-4 h-4" />
-            <span className="text-sm font-medium">Skin Trigger Detection</span>
+            <span className="text-sm font-medium">Skin Intelligence Scanner</span>
           </div>
           <h1 className="font-heading text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Scan for Skin Triggers
+            Analyze Ingredients for Skin Triggers
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
             Paste ingredients, enter a barcode, or search products to identify potential skin irritants and triggers.
@@ -221,16 +223,16 @@ export default function Scan() {
             {/* Sample */}
             <div className="mt-6 p-4 bg-secondary/50 rounded-lg">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <Beaker className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-foreground">Try a sample</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Not sure what to scan? Load our sample ingredients list to see how it works.
+                    Not sure what to scan? Load a sample ingredients list to see how it works.
                   </p>
                   <Button
                     variant="link"
                     size="sm"
-                    onClick={loadSample}
+                    onClick={() => setSampleModalOpen(true)}
                     className="px-0 h-auto mt-1 text-primary"
                   >
                     Load sample ingredients →
@@ -271,6 +273,13 @@ export default function Scan() {
           </Link>
         </div>
       </div>
+
+      {/* Sample Modal */}
+      <SampleScanModal
+        open={sampleModalOpen}
+        onOpenChange={setSampleModalOpen}
+        onSelectSample={handleSelectSample}
+      />
     </div>
   );
 }
