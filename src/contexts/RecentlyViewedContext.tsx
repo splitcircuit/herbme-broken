@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { STORAGE_KEYS, getStorageItem, setStorageItem } from '@/lib/storage';
 
 interface RecentlyViewedContextType {
   recentlyViewed: string[];
@@ -22,26 +23,20 @@ interface RecentlyViewedProviderProps {
 
 export const RecentlyViewedProvider = ({ children }: RecentlyViewedProviderProps) => {
   const [recentlyViewed, setRecentlyViewed] = useState<string[]>([]);
-  const maxItems = 6; // Maximum number of recently viewed items
+  const maxItems = 6;
 
-  // Load from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('herbme-recently-viewed');
-    if (saved) {
-      setRecentlyViewed(JSON.parse(saved));
-    }
+    const saved = getStorageItem<string[]>(STORAGE_KEYS.RECENTLY_VIEWED);
+    if (saved) setRecentlyViewed(saved);
   }, []);
 
-  // Save to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('herbme-recently-viewed', JSON.stringify(recentlyViewed));
+    setStorageItem(STORAGE_KEYS.RECENTLY_VIEWED, recentlyViewed);
   }, [recentlyViewed]);
 
   const addToRecentlyViewed = (productId: string) => {
     setRecentlyViewed(prev => {
-      // Remove if already exists
       const filtered = prev.filter(id => id !== productId);
-      // Add to front and limit to maxItems
       return [productId, ...filtered].slice(0, maxItems);
     });
   };

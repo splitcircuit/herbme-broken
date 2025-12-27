@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { STORAGE_KEYS, getStorageItem, setStorageItem } from '@/lib/storage';
 
 interface WishlistContextType {
   wishlistItems: string[];
@@ -25,17 +26,13 @@ interface WishlistProviderProps {
 export const WishlistProvider = ({ children }: WishlistProviderProps) => {
   const [wishlistItems, setWishlistItems] = useState<string[]>([]);
 
-  // Load wishlist from localStorage on mount
   useEffect(() => {
-    const savedWishlist = localStorage.getItem('herbme-wishlist');
-    if (savedWishlist) {
-      setWishlistItems(JSON.parse(savedWishlist));
-    }
+    const saved = getStorageItem<string[]>(STORAGE_KEYS.WISHLIST);
+    if (saved) setWishlistItems(saved);
   }, []);
 
-  // Save wishlist to localStorage whenever it changes
   useEffect(() => {
-    localStorage.setItem('herbme-wishlist', JSON.stringify(wishlistItems));
+    setStorageItem(STORAGE_KEYS.WISHLIST, wishlistItems);
   }, [wishlistItems]);
 
   const addToWishlist = (productId: string) => {

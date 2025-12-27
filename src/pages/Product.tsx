@@ -3,8 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, Leaf, Droplets, Sun } from "lucide-react";
-import { useParams, Link } from "react-router-dom";
+import { Star, Leaf, Droplets, Sun, Sparkles } from "lucide-react";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { getProductById } from "@/data/products";
 
@@ -22,6 +22,7 @@ declare global {
 
 const Product = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Load Shopify Buy Button script
@@ -248,10 +249,37 @@ const Product = () => {
                     <p>✓ Handmade in Turks & Caicos Islands</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              {/* Analyze Ingredients CTA */}
+              {product.ingredients && product.ingredients.length > 0 && (
+                <Card className="border-dashed bg-secondary/30">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">Check ingredients for triggers</p>
+                        <p className="text-xs text-muted-foreground">Scan with our Skin Intelligence Scanner</p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const ingredientsList = product.ingredients.map(i => i.name).join(', ');
+                          navigate(`/scan?prefill=${encodeURIComponent(ingredientsList)}`);
+                        }}
+                      >
+                        Analyze
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
-        </div>
 
         {/* Product Details Tabs */}
         <div className="mt-16">

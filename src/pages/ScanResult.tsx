@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSkinProfile } from "@/contexts/SkinProfileContext";
+import { getProfileOverlay } from "@/lib/rules/profileRiskOverlay";
+import { getRecommendedGoal } from "@/lib/rules/scanFlagToGoals";
+import { getGoalLabel } from "@/lib/rules/oilPrefillRules";
+import type { ScanResult as ScanResultType } from "@/lib/contracts/scan";
+import type { ProfileOverlay } from "@/lib/contracts/profile";
 import {
   Loader2,
   AlertTriangle,
@@ -16,33 +22,11 @@ import {
   Scan,
   ChevronRight,
   ExternalLink,
+  User,
+  Droplets,
+  Sparkles,
 } from "lucide-react";
 import ReportIssueModal from "@/components/scan/ReportIssueModal";
-
-interface MatchedIngredient {
-  name: string;
-  slug: string;
-  categories: string[];
-  severity: number;
-  notes: string;
-  matchedTerm: string;
-}
-
-interface FlagData {
-  key: string;
-  label: string;
-  severity: number;
-  matched: string[];
-}
-
-interface ScanResultData {
-  riskScore: number;
-  riskTier: "low" | "moderate" | "high";
-  flags: FlagData[];
-  summary: string[];
-  matchedIngredients: MatchedIngredient[];
-  disclaimer: string;
-}
 
 const tierConfig = {
   low: {
@@ -76,10 +60,14 @@ const severityColors: Record<number, string> = {
 
 export default function ScanResult() {
   const { scanId } = useParams<{ scanId: string }>();
+  const navigate = useNavigate();
   const { toast } = useToast();
+  const { profile, hasProfile } = useSkinProfile();
+  
   const [loading, setLoading] = useState(true);
-  const [result, setResult] = useState<ScanResultData | null>(null);
+  const [result, setResult] = useState<ScanResultType | null>(null);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [profileOverlay, setProfileOverlay] = useState<ProfileOverlay | null>(null);
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -94,7 +82,14 @@ export default function ScanResult() {
 
         if (error) throw error;
 
-        setResult(data.result_json as unknown as ScanResultData);
+        const scanResult = data.result_json as unknown as ScanResultType;
+        setResult(scanResult);
+
+        // Calculate profile overlay if profile exists
+        if (profile && scanResult) {
+          const overlay = getProfileOverlay(scanResult, profile);
+          setProfileOverlay(overlay);
+        }
       } catch (err) {
         console.error("Fetch error:", err);
         toast({
@@ -108,7 +103,7 @@ export default function ScanResult() {
     };
 
     fetchResult();
-  }, [scanId, toast]);
+  }, [scanId, toast, profile]);
 
   const handleShare = async () => {
     const url = window.location.href;
@@ -122,6 +117,15 @@ export default function ScanResult() {
       await navigator.clipboard.writeText(url);
       toast({ title: "Link copied to clipboard" });
     }
+  };
+
+  const handleBuildSupportiveBlend = () => {
+    if (!result || !scanId) return;
+    
+    const goalRec = getRecommendedGoal(result, profile || undefined);
+    const goal = goalRec?.goal || 'calm';
+    
+    navigate(`/build-oil?mode=support&scanId=${scanId}&goal=${goal}`);
   };
 
   if (loading) {
@@ -147,6 +151,7 @@ export default function ScanResult() {
 
   const tier = tierConfig[result.riskTier];
   const TierIcon = tier.icon;
+  const displayRiskScore = profileOverlay?.adjustedRiskScore ?? result.riskScore;
 
   return (
     <div className="min-h-screen bg-background pb-8">
@@ -160,13 +165,77 @@ export default function ScanResult() {
             {tier.label}
           </h1>
           <div className="flex items-center justify-center gap-2">
-            <span className="text-4xl font-bold text-foreground">{result.riskScore}</span>
+            <span className="text-4xl font-bold text-foreground">{displayRiskScore}</span>
             <span className="text-muted-foreground">/100</span>
           </div>
+          {profileOverlay?.adjustedRiskScore && profileOverlay.adjustedRiskScore > result.riskScore && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Adjusted for your profile (was {result.riskScore})
+            </p>
+          )}
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+        {/* Profile Overlay - For Your Profile Section */}
+        {hasProfile && profileOverlay && profileOverlay.personalWarnings.length > 0 && (
+          <Card className="border-primary/30 bg-primary/5">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <User className="w-5 h-5 text-primary" />
+                For Your Profile
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                {profileOverlay.personalWarnings.map((warning, i) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-foreground">{warning}</span>
+                  </div>
+                ))}
+              </div>
+              {profileOverlay.recommendedActions.length > 0 && (
+                <div className="pt-2 border-t border-primary/20">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Recommended Actions</p>
+                  <ul className="space-y-1">
+                    {profileOverlay.recommendedActions.slice(0, 2).map((action, i) => (
+                      <li key={i} className="text-xs text-muted-foreground flex items-start gap-1">
+                        <ChevronRight className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                        {action}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* No Profile CTA */}
+        {!hasProfile && result.riskScore > 20 && (
+          <Card className="border-dashed bg-secondary/30">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <User className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm text-foreground">Get personalized insights</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Add your Skin Profile to see how these results apply specifically to you.
+                  </p>
+                  <Link to="/skin-profile">
+                    <Button variant="link" size="sm" className="px-0 h-auto mt-1 text-primary">
+                      Create Skin Profile →
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Flags */}
         {result.flags.length > 0 && (
           <Card>
@@ -187,6 +256,34 @@ export default function ScanResult() {
                     {flag.label}
                   </Badge>
                 ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Build Supportive Blend CTA */}
+        {result.flags.length > 0 && (
+          <Card className="bg-gradient-to-br from-herb-sage/10 to-herb-cream/10 border-herb-sage/30">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Droplets className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-medium text-sm text-foreground">Build a supportive blend</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Create a custom oil blend designed to counter these triggers and support your skin.
+                  </p>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="mt-3"
+                    onClick={handleBuildSupportiveBlend}
+                  >
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    Build Supportive Blend
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

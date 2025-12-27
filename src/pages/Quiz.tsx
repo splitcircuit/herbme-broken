@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Sparkles, User, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useSkinProfile } from "@/contexts/SkinProfileContext";
+import { normalizeQuizToProfile } from "@/lib/rules/profileNormalizer";
 
 interface QuizData {
   skincare_goals: string[];
@@ -48,8 +51,11 @@ const Quiz = () => {
   });
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showProfileCTA, setShowProfileCTA] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { updateProfile, hasProfile } = useSkinProfile();
 
   const questions = [
     {
@@ -175,7 +181,6 @@ const Quiz = () => {
 
   const generateRecommendations = async (quizResponseId: string) => {
     try {
-      // Fetch products from database
       const { data: products, error } = await supabase
         .from('products')
         .select('*')
@@ -183,10 +188,8 @@ const Quiz = () => {
 
       if (error) throw error;
 
-      // Simple recommendation logic based on quiz responses
       const routine = [];
       
-      // Cleanser
       if (quizData.skin_type.includes('Oily') || quizData.skin_concerns.includes('Blackheads / whiteheads')) {
         const cleanser = products?.find(p => p.name === 'Clarifying Clay Cleanser');
         if (cleanser) routine.push({ product: cleanser, step: 'Cleanser', order: 1 });
@@ -195,13 +198,11 @@ const Quiz = () => {
         if (cleanser) routine.push({ product: cleanser, step: 'Cleanser', order: 1 });
       }
 
-      // Toner
       if (quizData.skincare_goals.includes('Brighten dull skin') || quizData.skincare_goals.includes('Fade dark spots or hyperpigmentation')) {
         const toner = products?.find(p => p.name === 'Turmeric Brightening Toner');
         if (toner) routine.push({ product: toner, step: 'Toner', order: 2 });
       }
 
-      // Treatment
       if (quizData.skincare_goals.includes('Soothe sensitive or irritated skin')) {
         const treatment = products?.find(p => p.name === 'Aloe Recovery Serum');
         if (treatment) routine.push({ product: treatment, step: 'Treatment', order: 3 });
@@ -210,17 +211,14 @@ const Quiz = () => {
         if (treatment) routine.push({ product: treatment, step: 'Treatment', order: 3 });
       }
 
-      // Moisturizer
       const moisturizer = products?.find(p => p.name === 'Sea Moss Daily Moisturizer');
       if (moisturizer) routine.push({ product: moisturizer, step: 'Moisturizer', order: 4 });
 
-      // SPF
       if (quizData.sun_exposure !== 'Rarely') {
         const spf = products?.find(p => p.name === 'Zinc Sun Shield SPF 30');
         if (spf) routine.push({ product: spf, step: 'SPF', order: 5 });
       }
 
-      // Save recommendations to database
       for (const item of routine) {
         await supabase.from('quiz_recommendations').insert({
           quiz_response_id: quizResponseId,
@@ -242,6 +240,26 @@ const Quiz = () => {
     }
   };
 
+  const handleApplyToProfile = async () => {
+    try {
+      const profile = normalizeQuizToProfile(quizData);
+      await updateProfile(profile);
+      setProfileSaved(true);
+      toast({
+        title: "Profile updated!",
+        description: user 
+          ? "Your Skin Profile has been saved to your account."
+          : "Your Skin Profile has been saved locally.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async () => {
     if (!user && !quizData.email) {
       toast({
@@ -254,7 +272,6 @@ const Quiz = () => {
 
     setIsSubmitting(true);
     try {
-      // Save quiz response with user_id if logged in, otherwise just use email
       const quizDataWithUser = {
         ...quizData,
         user_id: user?.id || null
@@ -268,7 +285,6 @@ const Quiz = () => {
 
       if (error) throw error;
 
-      // Generate recommendations
       await generateRecommendations(quizResponse.id);
 
       toast({
@@ -276,7 +292,8 @@ const Quiz = () => {
         description: "Your personalized routine is ready!"
       });
 
-      setCurrentStep(questions.length); // Show results
+      setCurrentStep(questions.length);
+      setShowProfileCTA(true);
     } catch (error) {
       console.error('Error submitting quiz:', error);
       toast({
@@ -335,6 +352,51 @@ const Quiz = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Profile CTA */}
+              {showProfileCTA && !profileSaved && (
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <User className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-medium text-foreground">Apply answers to your Skin Profile</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Save your quiz answers as your Skin Profile to get personalized scan results and product recommendations.
+                        </p>
+                        <Button 
+                          onClick={handleApplyToProfile}
+                          size="sm"
+                          className="mt-3"
+                        >
+                          <User className="w-4 h-4 mr-2" />
+                          Apply to Skin Profile
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {profileSaved && (
+                <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                        <Check className="w-4 h-4 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-green-800 dark:text-green-300">Skin Profile Updated</p>
+                        <p className="text-sm text-green-600 dark:text-green-400">
+                          <Link to="/skin-profile" className="underline">View your profile</Link> or <Link to="/scan" className="underline">scan products</Link> for personalized results.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {recommendations.map((item, index) => (
                 <div key={index} className="border border-border rounded-lg p-6 bg-sage-light/20">
                   <div className="flex items-start space-x-4">
@@ -343,8 +405,8 @@ const Quiz = () => {
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-lg text-primary-dark">{item.step}</h3>
-                       <h4 className="font-medium text-readable mt-1">{item.product.name}</h4>
-                       <p className="text-readable-muted mt-2">{item.product.description}</p>
+                      <h4 className="font-medium text-readable mt-1">{item.product.name}</h4>
+                      <p className="text-readable-muted mt-2">{item.product.description}</p>
                       <p className="text-primary font-semibold mt-2">${item.product.price}</p>
                     </div>
                   </div>
@@ -352,12 +414,19 @@ const Quiz = () => {
               ))}
               
               <div className="text-center pt-6">
-                 <p className="text-readable-muted mb-4">
-                   We've sent your personalized routine to {quizData.email}
-                 </p>
-                <Button size="lg" className="bg-gradient-primary text-white">
-                  Shop Your Routine
-                </Button>
+                <p className="text-readable-muted mb-4">
+                  We've sent your personalized routine to {quizData.email}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button size="lg" className="bg-gradient-primary text-white">
+                    Shop Your Routine
+                  </Button>
+                  <Link to="/build-oil">
+                    <Button size="lg" variant="outline">
+                      Build Custom Oil
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -374,9 +443,9 @@ const Quiz = () => {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-heading text-primary-dark">Skin Analysis Quiz</h1>
-             <span className="text-sm text-readable-muted">
-               {currentStep + 1} of {questions.length}
-             </span>
+            <span className="text-sm text-readable-muted">
+              {currentStep + 1} of {questions.length}
+            </span>
           </div>
           <div className="w-full bg-muted rounded-full h-2">
             <div 
