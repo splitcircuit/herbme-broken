@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +9,19 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
-import { Loader2, ClipboardPaste, Search, Barcode, Sparkles, Beaker, History } from "lucide-react";
+import { STORAGE_KEYS, getStorageItem, setStorageItem } from "@/lib/storage";
+import type { ScanHistoryItem } from "@/lib/contracts/scan";
+import { Loader2, ClipboardPaste, Search, Barcode, Sparkles, Beaker, History, Camera } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SampleScanModal, SampleItem } from "@/components/scan/SampleScanModal";
+import { BarcodeScannerModal } from "@/components/scan/BarcodeScannerModal";
+
+interface ProductSearchResult {
+  id: string;
+  name: string;
+  category: string;
+  ingredients: string[] | null;
+}
 
 export default function Scan() {
   const navigate = useNavigate();
@@ -24,18 +34,70 @@ export default function Scan() {
   const [productSearch, setProductSearch] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sampleModalOpen, setSampleModalOpen] = useState(false);
+  const [barcodeModalOpen, setBarcodeModalOpen] = useState(false);
+  
+  // Product search state
+  const [searchResults, setSearchResults] = useState<ProductSearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductSearchResult | null>(null);
+
+  // Product search with debounce
+  useEffect(() => {
+    if (activeTab !== "product" || productSearch.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("id, name, category, ingredients")
+          .ilike("name", `%${productSearch}%`)
+          .eq("is_active", true)
+          .limit(5);
+
+        if (!error && data) {
+          setSearchResults(data);
+        }
+      } catch (err) {
+        console.error("Search error:", err);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [productSearch, activeTab]);
+
+  const handleSelectProduct = (product: ProductSearchResult) => {
+    setSelectedProduct(product);
+    if (product.ingredients && product.ingredients.length > 0) {
+      setIngredientsText(product.ingredients.join(", "));
+    }
+    setSearchResults([]);
+    setProductSearch(product.name);
+    toast({
+      title: "Product selected",
+      description: `${product.name} ingredients loaded`,
+    });
+  };
 
   const handleAnalyze = async () => {
     let inputType: "paste" | "product" | "barcode" = "paste";
     let payload: Record<string, unknown> = {};
 
-    if (activeTab === "paste") {
+    if (activeTab === "paste" || (activeTab === "product" && selectedProduct)) {
       if (!ingredientsText.trim()) {
         toast({ title: "Please enter ingredients", variant: "destructive" });
         return;
       }
-      inputType = "paste";
-      payload = { ingredientsText: ingredientsText.trim() };
+      inputType = selectedProduct ? "product" : "paste";
+      payload = { 
+        ingredientsText: ingredientsText.trim(),
+        ...(selectedProduct && { productId: selectedProduct.id })
+      };
     } else if (activeTab === "barcode") {
       if (!barcode.trim()) {
         toast({ title: "Please enter a barcode", variant: "destructive" });
@@ -45,9 +107,10 @@ export default function Scan() {
       payload = { barcode: barcode.trim() };
     } else if (activeTab === "product") {
       if (!productSearch.trim()) {
-        toast({ title: "Please enter a product name or ingredients", variant: "destructive" });
+        toast({ title: "Please search for a product or paste ingredients", variant: "destructive" });
         return;
       }
+      // If no product selected, treat as paste
       inputType = "paste";
       payload = { ingredientsText: productSearch.trim() };
     }
@@ -65,9 +128,10 @@ export default function Scan() {
 
       if (error) throw error;
 
-      const history = JSON.parse(localStorage.getItem("scanHistory") || "[]");
+      // Save to localStorage history
+      const history = getStorageItem<ScanHistoryItem[]>(STORAGE_KEYS.SCAN_HISTORY) || [];
       history.unshift({ scanId: data.scanId, createdAt: new Date().toISOString() });
-      localStorage.setItem("scanHistory", JSON.stringify(history.slice(0, 5)));
+      setStorageItem(STORAGE_KEYS.SCAN_HISTORY, history.slice(0, 5));
 
       navigate(`/scan/result/${data.scanId}`);
     } catch (err) {
@@ -86,14 +150,26 @@ export default function Scan() {
     setIngredientsText("");
     setBarcode("");
     setProductSearch("");
+    setSelectedProduct(null);
+    setSearchResults([]);
   };
 
   const handleSelectSample = (sample: SampleItem) => {
     setIngredientsText(sample.ingredients);
     setActiveTab("paste");
+    setSelectedProduct(null);
     toast({
       title: "Sample loaded",
       description: `"${sample.name}" ingredients ready to analyze`,
+    });
+  };
+
+  const handleBarcodeScanned = (scannedBarcode: string) => {
+    setBarcode(scannedBarcode);
+    setActiveTab("barcode");
+    toast({
+      title: "Barcode captured",
+      description: `Barcode ${scannedBarcode} ready to analyze`,
     });
   };
 
@@ -110,7 +186,7 @@ export default function Scan() {
             Analyze Ingredients for Skin Triggers
           </h1>
           <p className="text-muted-foreground text-lg max-w-xl mx-auto">
-            Paste ingredients, enter a barcode, or search products to identify potential skin irritants and triggers.
+            Paste ingredients, search our database, or scan a barcode to identify potential skin irritants.
           </p>
         </div>
       </div>
@@ -166,31 +242,90 @@ export default function Scan() {
               <TabsContent value="product" className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">
-                    Search Product
+                    Search Product Database
                   </label>
-                  <Input
-                    placeholder="Enter product name or paste ingredients..."
-                    value={productSearch}
-                    onChange={(e) => setProductSearch(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Product database coming soon. For now, paste ingredients directly.
-                  </p>
+                  <div className="relative">
+                    <Input
+                      placeholder="Search products by name..."
+                      value={productSearch}
+                      onChange={(e) => {
+                        setProductSearch(e.target.value);
+                        setSelectedProduct(null);
+                      }}
+                    />
+                    {isSearching && (
+                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+                    )}
+                  </div>
+                  
+                  {/* Search Results Dropdown */}
+                  {searchResults.length > 0 && (
+                    <div className="mt-2 border rounded-lg overflow-hidden bg-background shadow-lg">
+                      {searchResults.map((product) => (
+                        <button
+                          key={product.id}
+                          onClick={() => handleSelectProduct(product)}
+                          className="w-full px-4 py-3 text-left hover:bg-secondary/50 transition-colors border-b last:border-b-0"
+                        >
+                          <div className="font-medium text-sm text-foreground">{product.name}</div>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {product.category}
+                            </Badge>
+                            {product.ingredients && (
+                              <span className="text-xs text-muted-foreground">
+                                {product.ingredients.length} ingredients
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {selectedProduct && (
+                    <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-foreground">{selectedProduct.name}</p>
+                          <p className="text-xs text-muted-foreground">Ingredients loaded</p>
+                        </div>
+                        <Badge variant="secondary">Selected</Badge>
+                      </div>
+                    </div>
+                  )}
+
+                  {!selectedProduct && productSearch.length >= 2 && searchResults.length === 0 && !isSearching && (
+                    <p className="text-xs text-muted-foreground mt-2">
+                      No products found. Try pasting ingredients directly instead.
+                    </p>
+                  )}
                 </div>
               </TabsContent>
 
               <TabsContent value="barcode" className="space-y-4">
                 <div>
                   <label className="text-sm font-medium text-foreground mb-2 block">
-                    Enter Barcode
+                    Enter or Scan Barcode
                   </label>
-                  <Input
-                    placeholder="e.g., 5060462750012"
-                    value={barcode}
-                    onChange={(e) => setBarcode(e.target.value)}
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="e.g., 5060462750012"
+                      value={barcode}
+                      onChange={(e) => setBarcode(e.target.value)}
+                      className="flex-1"
+                    />
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setBarcodeModalOpen(true)}
+                      className="flex-shrink-0"
+                    >
+                      <Camera className="w-4 h-4 mr-2" />
+                      Scan
+                    </Button>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Camera scanning coming soon. Enter the barcode manually for now.
+                    Use camera to scan or enter barcode manually
                   </p>
                 </div>
               </TabsContent>
@@ -258,15 +393,15 @@ export default function Scan() {
               </div>
             </Card>
           </Link>
-          <Link to="/quiz">
+          <Link to="/skin-profile">
             <Card className="p-4 hover:border-primary/50 transition-colors cursor-pointer">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-primary" />
                 </div>
                 <div>
-                  <p className="font-medium text-sm">Take Skin Quiz</p>
-                  <p className="text-xs text-muted-foreground">Get personalized tips</p>
+                  <p className="font-medium text-sm">Skin Profile</p>
+                  <p className="text-xs text-muted-foreground">Get personalized results</p>
                 </div>
               </div>
             </Card>
@@ -274,11 +409,16 @@ export default function Scan() {
         </div>
       </div>
 
-      {/* Sample Modal */}
+      {/* Modals */}
       <SampleScanModal
         open={sampleModalOpen}
         onOpenChange={setSampleModalOpen}
         onSelectSample={handleSelectSample}
+      />
+      <BarcodeScannerModal
+        open={barcodeModalOpen}
+        onOpenChange={setBarcodeModalOpen}
+        onBarcodeScanned={handleBarcodeScanned}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,11 +7,16 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
-import { ArrowLeft, ArrowRight, Droplets, Plus, Minus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, ArrowRight, Droplets, Plus, Minus, Sparkles, RotateCcw, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useCart } from "@/contexts/CartContext";
+import { useSkinProfile } from "@/contexts/SkinProfileContext";
+import { generateOilPrefill, getGoalLabel, getGoalDescription } from "@/lib/rules/oilPrefillRules";
+import type { ScanResult } from "@/lib/contracts/scan";
+import type { SupportGoal, OilFormulaDraft } from '@/lib/contracts/oil';
 
 interface BaseOil {
   name: string;
@@ -31,6 +36,14 @@ interface CustomBlend {
 }
 
 const BuildOil = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  // Support mode params
+  const mode = searchParams.get('mode') as 'support' | null;
+  const scanId = searchParams.get('scanId');
+  const goalParam = searchParams.get('goal') as SupportGoal | null;
+  
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedBaseOils, setSelectedBaseOils] = useState<BaseOil[]>([]);
   const [boostIngredients, setBoostIngredients] = useState<string[]>([]);
@@ -40,10 +53,16 @@ const BuildOil = () => {
   const [bottleSize, setBottleSize] = useState('30ml');
   const [totalPrice, setTotalPrice] = useState(0);
   const [allergens, setAllergens] = useState<string[]>([]);
+  
+  // Support mode state
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [prefillDraft, setPrefillDraft] = useState<OilFormulaDraft | null>(null);
+  const [isLoadingScan, setIsLoadingScan] = useState(false);
+  
   const { toast } = useToast();
   const { user } = useAuth();
   const { addToCart } = useCart();
-  const navigate = useNavigate();
+  const { profile } = useSkinProfile();
 
   const baseOilOptions = [
     { 
@@ -109,6 +128,91 @@ const BuildOil = () => {
     { size: 'Eco-pack refill', price: 20.00 }
   ];
 
+  // Load scan result and generate prefill for support mode
+  useEffect(() => {
+    const loadSupportMode = async () => {
+      if (mode !== 'support' || !scanId) return;
+      
+      setIsLoadingScan(true);
+      try {
+        const { data, error } = await supabase
+          .from('scan_events')
+          .select('result_json')
+          .eq('id', scanId)
+          .single();
+
+        if (error) throw error;
+
+        const result = data.result_json as unknown as ScanResult;
+        setScanResult(result);
+
+        // Generate prefill
+        const draft = generateOilPrefill({
+          scanResult: result,
+          profile: profile || undefined,
+          goal: goalParam || undefined,
+        });
+        setPrefillDraft(draft);
+
+        // Apply prefill to form state
+        applyPrefill(draft);
+        
+        toast({
+          title: "Support blend ready",
+          description: `Formula designed for ${getGoalLabel(draft.goal || 'calm')}`,
+        });
+      } catch (err) {
+        console.error('Failed to load scan:', err);
+        toast({
+          title: "Couldn't load scan data",
+          description: "Starting with default builder instead",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoadingScan(false);
+      }
+    };
+
+    loadSupportMode();
+  }, [mode, scanId, goalParam, profile]);
+
+  // Apply prefill draft to form state
+  const applyPrefill = (draft: OilFormulaDraft) => {
+    // Convert draft base oils to full BaseOil objects
+    const oils: BaseOil[] = draft.baseOils.map(draftOil => {
+      const fullOil = baseOilOptions.find(o => o.name === draftOil.name);
+      return {
+        name: draftOil.name,
+        percentage: draftOil.percentage,
+        benefits: fullOil?.benefits || [],
+        price_per_ml: fullOil?.price_per_ml || 0.20,
+      };
+    });
+    setSelectedBaseOils(oils);
+    setBoostIngredients(draft.boostIngredients);
+    setScent(draft.scent);
+    if (draft.goal) {
+      setBlendName(`${getGoalLabel(draft.goal)} Blend`);
+    }
+  };
+
+  // Reset to default builder
+  const handleResetToDefault = () => {
+    setSelectedBaseOils([]);
+    setBoostIngredients([]);
+    setScent('');
+    setCustomScent('');
+    setBlendName('');
+    setBottleSize('30ml');
+    setScanResult(null);
+    setPrefillDraft(null);
+    navigate('/build-oil', { replace: true });
+    toast({
+      title: "Reset complete",
+      description: "Starting fresh with default builder",
+    });
+  };
+
   // Fetch user allergens from previous quiz
   useEffect(() => {
     const fetchUserAllergens = async () => {
@@ -124,7 +228,7 @@ const BuildOil = () => {
           setAllergens(data.allergies || []);
         }
       } catch (error) {
-        // No previous quiz data found - this is expected for new users
+        // No previous quiz data found
       }
     };
 
@@ -135,24 +239,20 @@ const BuildOil = () => {
   useEffect(() => {
     let price = 0;
     
-    // Base bottle price
     const bottlePrice = bottleSizes.find(b => b.size === bottleSize)?.price || 0;
     price += bottlePrice;
 
-    // Base oils price
     const bottleVolume = bottleSize === 'Eco-pack refill' ? 100 : parseInt(bottleSize);
     selectedBaseOils.forEach(oil => {
       const oilPrice = baseOilOptions.find(b => b.name === oil.name)?.price_per_ml || 0;
       price += (oil.percentage / 100) * bottleVolume * oilPrice;
     });
 
-    // Boost ingredients price
     boostIngredients.forEach(ingredient => {
       const boost = boostOptions.find(b => b.name === ingredient);
       if (boost) price += boost.price;
     });
 
-    // Scent price
     if (scent === 'Custom scent') price += 10.00;
     else if (scent !== 'Unscented' && scent !== '') price += 5.00;
 
@@ -172,7 +272,6 @@ const BuildOil = () => {
     const oil = baseOilOptions.find(o => o.name === oilName);
     if (!oil) return;
 
-    // Check allergens
     if (oil.allergens.some(allergen => allergens.includes(allergen))) {
       toast({
         title: "Allergen detected",
@@ -195,7 +294,6 @@ const BuildOil = () => {
   const removeBaseOil = (index: number) => {
     const newOils = selectedBaseOils.filter((_, i) => i !== index);
     
-    // Redistribute percentages
     if (newOils.length > 0) {
       const equalPercentage = Math.floor(100 / newOils.length);
       const remainder = 100 - (equalPercentage * newOils.length);
@@ -213,7 +311,6 @@ const BuildOil = () => {
     const oldPercentage = newOils[index].percentage;
     newOils[index].percentage = percentage;
 
-    // Adjust other oils to maintain 100%
     const remainingOils = newOils.filter((_, i) => i !== index);
     const remainingPercentage = 100 - percentage;
     
@@ -223,7 +320,6 @@ const BuildOil = () => {
         oil.percentage = Math.round(oil.percentage * adjustmentFactor);
       });
       
-      // Ensure total is exactly 100%
       const currentTotal = newOils.reduce((sum, oil) => sum + oil.percentage, 0);
       if (currentTotal !== 100) {
         newOils[0].percentage += 100 - currentTotal;
@@ -267,9 +363,8 @@ const BuildOil = () => {
   };
 
   const addToCartHandler = () => {
-    // Create custom blend cart item
     const customBlendItem = {
-      id: `custom-blend-${Date.now()}`, // Unique ID for custom blend
+      id: `custom-blend-${Date.now()}`,
       name: blendName || 'Custom Oil Blend',
       price: totalPrice,
       type: 'custom_blend' as const
@@ -282,15 +377,14 @@ const BuildOil = () => {
       description: `${customBlendItem.name} has been added to your cart.`
     });
     
-    // Navigate to cart
     navigate('/cart');
   };
 
   const saveBlend = async () => {
     if (!user) {
       toast({
-        title: "Email Required",
-        description: "Please provide your email to save your custom blend.",
+        title: "Sign in required",
+        description: "Please sign in to save your custom blend.",
         variant: "destructive",
       });
       return;
@@ -356,8 +450,8 @@ const BuildOil = () => {
   const isStepValid = () => {
     switch (currentStep) {
       case 0: return selectedBaseOils.length > 0;
-      case 1: return true; // Optional step
-      case 2: return true; // Optional step
+      case 1: return true;
+      case 2: return true;
       case 3: return blendName.trim() !== '';
       case 4: return bottleSize !== '';
       case 5: return true;
@@ -365,9 +459,60 @@ const BuildOil = () => {
     }
   };
 
+  if (isLoadingScan) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-sage-light via-background to-sage-light/50 py-12 flex items-center justify-center">
+        <div className="text-center">
+          <Droplets className="w-12 h-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Loading your support blend...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-sage-light via-background to-sage-light/50 py-12">
       <div className="max-w-4xl mx-auto px-4">
+        {/* Support Mode Banner */}
+        {mode === 'support' && prefillDraft && (
+          <Card className="mb-6 bg-primary/5 border-primary/20">
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-foreground">Support Mode: {getGoalLabel(prefillDraft.goal || 'calm')}</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {getGoalDescription(prefillDraft.goal || 'calm')}
+                    </p>
+                    {prefillDraft.rationale && prefillDraft.rationale.length > 0 && (
+                      <div className="mt-3 space-y-1">
+                        {prefillDraft.rationale.slice(0, 2).map((reason, i) => (
+                          <p key={i} className="text-xs text-muted-foreground flex items-start gap-1">
+                            <AlertCircle className="w-3 h-3 mt-0.5 flex-shrink-0 text-primary" />
+                            {reason}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={handleResetToDefault}
+                  className="flex-shrink-0"
+                >
+                  <RotateCcw className="w-4 h-4 mr-1" />
+                  Reset
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-3xl font-heading text-primary-dark">Build Your Custom Oil</h1>
@@ -399,7 +544,6 @@ const BuildOil = () => {
                   <div className="space-y-6">
                     <p className="text-readable-muted">Select up to 3 base oils. Adjust percentages with sliders.</p>
                     
-                    {/* Selected Oils */}
                     {selectedBaseOils.length > 0 && (
                       <div className="space-y-4 p-4 bg-sage-light/20 rounded-lg">
                         <h3 className="font-semibold text-primary-dark">Your Base Oil Blend</h3>
@@ -426,28 +570,27 @@ const BuildOil = () => {
                               step={5}
                               className="w-full"
                             />
-                             <div className="text-xs text-readable-muted">
-                               Benefits: {oil.benefits.join(', ')}
-                             </div>
+                            <div className="text-xs text-readable-muted">
+                              Benefits: {oil.benefits.join(', ')}
+                            </div>
                           </div>
                         ))}
                       </div>
                     )}
 
-                    {/* Available Oils */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {baseOilOptions
                         .filter(oil => !selectedBaseOils.some(selected => selected.name === oil.name))
                         .filter(oil => !oil.allergens.some(allergen => allergens.includes(allergen)))
                         .map((oil) => (
                         <div key={oil.name} className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow">
-                           <div className="flex justify-between items-start mb-2">
-                             <h4 className="font-semibold text-readable">{oil.name}</h4>
-                             <span className="text-sm text-readable-muted">${oil.price_per_ml}/ml</span>
-                           </div>
-                           <p className="text-sm text-readable-secondary mb-3">
-                             {oil.benefits.join(', ')}
-                           </p>
+                          <div className="flex justify-between items-start mb-2">
+                            <h4 className="font-semibold text-readable">{oil.name}</h4>
+                            <span className="text-sm text-readable-muted">${oil.price_per_ml}/ml</span>
+                          </div>
+                          <p className="text-sm text-readable-secondary mb-3">
+                            {oil.benefits.join(', ')}
+                          </p>
                           <Button
                             variant="outline"
                             size="sm"
@@ -482,14 +625,14 @@ const BuildOil = () => {
                             />
                             <div className="flex-1">
                               <div className="flex justify-between items-start">
-                                 <Label htmlFor={boost.name} className="font-semibold text-readable">
-                                   {boost.name}
-                                 </Label>
-                                 <span className="text-sm text-readable-muted">+${boost.price}</span>
-                               </div>
-                               <p className="text-sm text-readable-secondary mt-1">
-                                 {boost.benefits.join(', ')}
-                               </p>
+                                <Label htmlFor={boost.name} className="font-semibold text-readable">
+                                  {boost.name}
+                                </Label>
+                                <span className="text-sm text-readable-muted">+${boost.price}</span>
+                              </div>
+                              <p className="text-sm text-readable-secondary mt-1">
+                                {boost.benefits.join(', ')}
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -575,47 +718,47 @@ const BuildOil = () => {
                     
                     <div className="bg-sage-light/20 rounded-lg p-6 space-y-4">
                       <div>
-                         <h4 className="font-semibold text-readable">{blendName}</h4>
-                         <p className="text-sm text-readable-muted">{bottleSize} bottle</p>
-                       </div>
+                        <h4 className="font-semibold text-readable">{blendName}</h4>
+                        <p className="text-sm text-readable-muted">{bottleSize} bottle</p>
+                      </div>
 
-                       <div>
-                         <h5 className="font-medium text-readable mb-2">Base Oils:</h5>
-                         {selectedBaseOils.map((oil, index) => (
-                           <div key={index} className="text-sm text-readable-secondary">
-                             {oil.name}: {oil.percentage}%
-                           </div>
-                         ))}
-                       </div>
+                      <div>
+                        <h5 className="font-medium text-readable mb-2">Base Oils:</h5>
+                        {selectedBaseOils.map((oil, index) => (
+                          <div key={index} className="text-sm text-readable-secondary">
+                            {oil.name}: {oil.percentage}%
+                          </div>
+                        ))}
+                      </div>
 
-                       {boostIngredients.length > 0 && (
-                         <div>
-                           <h5 className="font-medium text-readable mb-2">Boost Ingredients:</h5>
-                           <div className="text-sm text-readable-secondary">
-                             {boostIngredients.join(', ')}
-                           </div>
-                         </div>
-                       )}
+                      {boostIngredients.length > 0 && (
+                        <div>
+                          <h5 className="font-medium text-readable mb-2">Boost Ingredients:</h5>
+                          <div className="text-sm text-readable-secondary">
+                            {boostIngredients.join(', ')}
+                          </div>
+                        </div>
+                      )}
 
-                       {scent && scent !== 'Unscented' && (
-                         <div>
-                           <h5 className="font-medium text-readable mb-2">Scent:</h5>
-                           <div className="text-sm text-readable-secondary">
-                             {scent === 'Custom scent' ? customScent : scent}
-                           </div>
-                         </div>
-                       )}
+                      {scent && scent !== 'Unscented' && (
+                        <div>
+                          <h5 className="font-medium text-readable mb-2">Scent:</h5>
+                          <div className="text-sm text-readable-secondary">
+                            {scent === 'Custom scent' ? customScent : scent}
+                          </div>
+                        </div>
+                      )}
 
-                       <div>
-                         <h5 className="font-medium text-readable mb-2">Benefits:</h5>
-                         <div className="text-sm text-readable-secondary">
-                           {generateBenefits().join(', ')}
-                         </div>
-                       </div>
+                      <div>
+                        <h5 className="font-medium text-readable mb-2">Benefits:</h5>
+                        <div className="text-sm text-readable-secondary">
+                          {generateBenefits().join(', ')}
+                        </div>
+                      </div>
 
-                       <div className="border-t border-border pt-4">
-                         <div className="flex justify-between items-center">
-                           <span className="text-lg font-semibold text-readable">Total Price:</span>
+                      <div className="border-t border-border pt-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-semibold text-readable">Total Price:</span>
                           <span className="text-2xl font-bold text-primary">${totalPrice}</span>
                         </div>
                       </div>
@@ -668,38 +811,38 @@ const BuildOil = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                   <h4 className="font-medium text-readable mb-2">Blend Name:</h4>
-                   <p className="text-sm text-readable-muted">{blendName || 'Not named yet'}</p>
-                 </div>
+                  <h4 className="font-medium text-readable mb-2">Blend Name:</h4>
+                  <p className="text-sm text-readable-muted">{blendName || 'Not named yet'}</p>
+                </div>
 
-                 {selectedBaseOils.length > 0 && (
-                   <div>
-                     <h4 className="font-medium text-readable mb-2">Base Oils:</h4>
-                     {selectedBaseOils.map((oil, index) => (
-                       <div key={index} className="text-sm text-readable-secondary">
-                         {oil.name}: {oil.percentage}%
-                       </div>
-                     ))}
-                   </div>
-                 )}
+                {selectedBaseOils.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-readable mb-2">Base Oils:</h4>
+                    {selectedBaseOils.map((oil, index) => (
+                      <div key={index} className="text-sm text-readable-secondary">
+                        {oil.name}: {oil.percentage}%
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-                 {boostIngredients.length > 0 && (
-                   <div>
-                     <h4 className="font-medium text-readable mb-2">Boosts:</h4>
-                     <div className="text-sm text-readable-secondary">
-                       {boostIngredients.join(', ')}
-                     </div>
-                   </div>
-                 )}
+                {boostIngredients.length > 0 && (
+                  <div>
+                    <h4 className="font-medium text-readable mb-2">Boosts:</h4>
+                    <div className="text-sm text-readable-secondary">
+                      {boostIngredients.join(', ')}
+                    </div>
+                  </div>
+                )}
 
-                 <div>
-                   <h4 className="font-medium text-readable mb-2">Bottle Size:</h4>
-                   <p className="text-sm text-readable-muted">{bottleSize}</p>
-                 </div>
+                <div>
+                  <h4 className="font-medium text-readable mb-2">Bottle Size:</h4>
+                  <p className="text-sm text-readable-muted">{bottleSize}</p>
+                </div>
 
-                 <div className="border-t border-border pt-4">
-                   <div className="flex justify-between items-center">
-                     <span className="font-medium text-readable">Total:</span>
+                <div className="border-t border-border pt-4">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-readable">Total:</span>
                     <span className="text-xl font-bold text-primary">${totalPrice}</span>
                   </div>
                 </div>
