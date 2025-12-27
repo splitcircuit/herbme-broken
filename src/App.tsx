@@ -11,6 +11,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { RecentlyViewedProvider } from "@/contexts/RecentlyViewedContext";
+import { SkinProfileProvider } from "@/contexts/SkinProfileContext";
 import { LocationProvider } from "@/components/shop/LocationDetector";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { AccessibilityProvider } from "@/components/AccessibilityProvider";
@@ -33,6 +34,7 @@ import ScanResult from "./pages/ScanResult";
 import ScanHistory from "./pages/ScanHistory";
 import Ingredients from "./pages/Ingredients";
 import IngredientDetail from "./pages/IngredientDetail";
+import SkinProfilePage from "./pages/SkinProfile";
 
 const App = () => (
   <ErrorBoundary>
@@ -44,39 +46,42 @@ const App = () => (
               <ScrollToTop />
               <AuthProvider>
                 <LocationProvider>
-                  <CartProvider>
-                    <WishlistProvider>
-                      <RecentlyViewedProvider>
-                        <div className="min-h-screen flex flex-col">
-                          <Navigation />
-                          <main className="flex-1">
-                            <Routes>
-                              <Route path="/" element={<Index />} />
-                              <Route path="/shop" element={<Shop />} />
-                              <Route path="/cart" element={<Cart />} />
-                              <Route path="/checkout" element={<Checkout />} />
-                              <Route path="/auth" element={<Auth />} />
-                              <Route path="/quiz" element={<Quiz />} />
-                              <Route path="/build-oil" element={<BuildOil />} />
-                              <Route path="/product/:id" element={<Product />} />
-                              <Route path="/story" element={<Story />} />
-                              <Route path="/blog" element={<Blog />} />
-                              <Route path="/contact" element={<Contact />} />
-                              <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmation />} />
-                              <Route path="/scan" element={<Scan />} />
-                              <Route path="/scan/result/:scanId" element={<ScanResult />} />
-                              <Route path="/scan-history" element={<ScanHistory />} />
-                              <Route path="/ingredients" element={<Ingredients />} />
-                              <Route path="/ingredients/:slug" element={<IngredientDetail />} />
-                              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                              <Route path="*" element={<NotFound />} />
-                            </Routes>
-                          </main>
-                          <Footer />
-                        </div>
-                      </RecentlyViewedProvider>
-                    </WishlistProvider>
-                  </CartProvider>
+                  <SkinProfileProvider>
+                    <CartProvider>
+                      <WishlistProvider>
+                        <RecentlyViewedProvider>
+                          <div className="min-h-screen flex flex-col">
+                            <Navigation />
+                            <main className="flex-1">
+                              <Routes>
+                                <Route path="/" element={<Index />} />
+                                <Route path="/shop" element={<Shop />} />
+                                <Route path="/cart" element={<Cart />} />
+                                <Route path="/checkout" element={<Checkout />} />
+                                <Route path="/auth" element={<Auth />} />
+                                <Route path="/quiz" element={<Quiz />} />
+                                <Route path="/build-oil" element={<BuildOil />} />
+                                <Route path="/product/:id" element={<Product />} />
+                                <Route path="/story" element={<Story />} />
+                                <Route path="/blog" element={<Blog />} />
+                                <Route path="/contact" element={<Contact />} />
+                                <Route path="/order-confirmation/:orderNumber" element={<OrderConfirmation />} />
+                                <Route path="/scan" element={<Scan />} />
+                                <Route path="/scan/result/:scanId" element={<ScanResult />} />
+                                <Route path="/scan-history" element={<ScanHistory />} />
+                                <Route path="/ingredients" element={<Ingredients />} />
+                                <Route path="/ingredients/:slug" element={<IngredientDetail />} />
+                                <Route path="/skin-profile" element={<SkinProfilePage />} />
+                                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                                <Route path="*" element={<NotFound />} />
+                              </Routes>
+                            </main>
+                            <Footer />
+                          </div>
+                        </RecentlyViewedProvider>
+                      </WishlistProvider>
+                    </CartProvider>
+                  </SkinProfileProvider>
                 </LocationProvider>
               </AuthProvider>
             </BrowserRouter>
