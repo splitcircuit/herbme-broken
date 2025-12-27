@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { STORAGE_KEYS, getStorageItem, setStorageItem, migrateStorageKeys } from '@/lib/storage';
 
 interface CartItem {
   id: string;
@@ -39,6 +40,24 @@ interface CartProviderProps {
 
 export const CartProvider = ({ children }: CartProviderProps) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Migrate old storage keys and load cart on mount
+  useEffect(() => {
+    migrateStorageKeys();
+    const savedCart = getStorageItem<CartItem[]>(STORAGE_KEYS.CART);
+    if (savedCart && Array.isArray(savedCart)) {
+      setCartItems(savedCart);
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Persist cart to localStorage when it changes (after initialization)
+  useEffect(() => {
+    if (isInitialized) {
+      setStorageItem(STORAGE_KEYS.CART, cartItems);
+    }
+  }, [cartItems, isInitialized]);
 
   const addToCart = (item: Omit<CartItem, 'quantity'>) => {
     const existingItem = cartItems.find(cartItem => cartItem.id === item.id);
