@@ -168,6 +168,41 @@ export type Database = {
           },
         ]
       }
+      issue_reports: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          issue_type: string
+          message: string
+          scan_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          issue_type: string
+          message: string
+          scan_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          issue_type?: string
+          message?: string
+          scan_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "issue_reports_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "scan_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       orders: {
         Row: {
           admin_notes: string | null
@@ -520,6 +555,66 @@ export type Database = {
         }
         Relationships: []
       }
+      scan_events: {
+        Row: {
+          barcode: string | null
+          created_at: string
+          id: string
+          input_type: string
+          product_id: string | null
+          raw_ingredients_text: string | null
+          result_json: Json
+          user_id: string | null
+        }
+        Insert: {
+          barcode?: string | null
+          created_at?: string
+          id?: string
+          input_type: string
+          product_id?: string | null
+          raw_ingredients_text?: string | null
+          result_json?: Json
+          user_id?: string | null
+        }
+        Update: {
+          barcode?: string | null
+          created_at?: string
+          id?: string
+          input_type?: string
+          product_id?: string | null
+          raw_ingredients_text?: string | null
+          result_json?: Json
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      skin_profiles: {
+        Row: {
+          created_at: string
+          flags: string[] | null
+          id: string
+          skin_type: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          flags?: string[] | null
+          id?: string
+          skin_type?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          flags?: string[] | null
+          id?: string
+          skin_type?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscribers: {
         Row: {
           created_at: string
@@ -565,6 +660,42 @@ export type Database = {
         }
         Relationships: []
       }
+      trigger_ingredients: {
+        Row: {
+          aliases: string[] | null
+          categories: string[] | null
+          common_products: string[] | null
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          severity: number
+          slug: string
+        }
+        Insert: {
+          aliases?: string[] | null
+          categories?: string[] | null
+          common_products?: string[] | null
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          severity?: number
+          slug: string
+        }
+        Update: {
+          aliases?: string[] | null
+          categories?: string[] | null
+          common_products?: string[] | null
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          severity?: number
+          slug?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -598,10 +729,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "manager" | "user"

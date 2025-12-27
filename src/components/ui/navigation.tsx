@@ -14,6 +14,7 @@ const Navigation = () => {
   const { theme, setTheme } = useTheme();
 
   const navItems = [
+    { name: "Scan", path: "/scan" },
     { name: "Shop", path: "/shop" },
     { name: "Quiz", path: "/quiz" },
     { name: "Build Oil", path: "/build-oil" },
